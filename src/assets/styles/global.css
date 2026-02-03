@@ -1,0 +1,611 @@
+/**
+ * 墨记 - 全局样式表
+ * 包含中国风视觉系统的所有样式定义
+ * 
+ * 设计理念：
+ * - 仿古宣纸质感，追求古籍排版美学
+ * - 大量留白，不对称的平衡感
+ * - 竖排阅读支持，还原传统阅读体验
+ */
+
+/* ========================================
+   1. 字体引入
+   ======================================== */
+
+/* 霞鹜文楷 - 主字体 */
+@import url('https://cdn.jsdelivr.net/npm/lxgw-wenkai-webfont@1.7.0/style.css');
+
+/* ========================================
+   2. CSS 变量定义
+   ======================================== */
+:root {
+  /* 色彩系统 */
+  --ink-paper: #fefcf5;
+  --ink-dark: #2c3e50;
+  --ink-ochre: #8b4513;
+  --ink-green: #556b2f;
+  --ink-sandalwood: #c1a173;
+  --ink-rice: #d4b483;
+  --ink-hover: #f5f1e8;
+  
+  /* 夜读模式 */
+  --night-bg: #1a1a1a;
+  --night-text: #c1a173;
+  --night-accent: #8b4513;
+  
+  /* 透明度变体 */
+  --ink-ochre-10: rgba(139, 69, 19, 0.1);
+  --ink-ochre-20: rgba(139, 69, 19, 0.2);
+  --ink-ochre-30: rgba(139, 69, 19, 0.3);
+  --ink-dark-10: rgba(44, 62, 80, 0.1);
+  --ink-dark-20: rgba(44, 62, 80, 0.2);
+  
+  /* 字体 */
+  --font-wenkai: 'LXGW WenKai', 'Microsoft YaHei', sans-serif;
+  --font-serif: 'Noto Serif SC', 'Source Han Serif SC', serif;
+  
+  /* 间距 */
+  --spacing-xs: 0.5rem;
+  --spacing-sm: 0.75rem;
+  --spacing-md: 1rem;
+  --spacing-lg: 1.5rem;
+  --spacing-xl: 2rem;
+  --spacing-2xl: 3rem;
+  
+  /* 圆角 */
+  --radius-ink: 2px;
+  
+  /* 阴影 */
+  --shadow-paper: 0 2px 8px rgba(0, 0, 0, 0.06), 0 1px 3px rgba(0, 0, 0, 0.04);
+  --shadow-paper-lg: 0 4px 16px rgba(0, 0, 0, 0.08), 0 2px 6px rgba(0, 0, 0, 0.06);
+  
+  /* 过渡 */
+  --transition-fast: 150ms ease;
+  --transition-normal: 300ms ease;
+  --transition-slow: 500ms ease;
+}
+
+/* ========================================
+   3. 基础重置样式
+   ======================================== */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+body {
+  font-family: var(--font-wenkai);
+  background-color: var(--ink-paper);
+  color: var(--ink-dark);
+  line-height: 1.8;
+  letter-spacing: 0.05em;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* 滚动条样式 - 中国风 */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--ink-hover);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--ink-sandalwood);
+  border-radius: var(--radius-ink);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--ink-ochre);
+}
+
+/* 选中文本样式 */
+::selection {
+  background: var(--ink-ochre-20);
+  color: var(--ink-dark);
+}
+
+/* ========================================
+   4. 夜读模式样式
+   ======================================== */
+body.night-mode {
+  background-color: var(--night-bg);
+  color: var(--night-text);
+}
+
+body.night-mode ::selection {
+  background: var(--ink-ochre-30);
+  color: var(--night-text);
+}
+
+body.night-mode ::-webkit-scrollbar-track {
+  background: #2a2a2a;
+}
+
+body.night-mode ::-webkit-scrollbar-thumb {
+  background: var(--ink-ochre);
+}
+
+/* ========================================
+   5. 竖排排版支持
+   ======================================== */
+
+/* 基础竖排类 */
+.writing-vertical {
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+}
+
+.writing-vertical-upright {
+  writing-mode: vertical-rl;
+  text-orientation: upright;
+}
+
+.writing-horizontal {
+  writing-mode: horizontal-tb;
+}
+
+/* 竖排容器 */
+.vertical-container {
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+  height: 100%;
+  max-height: 80vh;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 2rem;
+}
+
+/* 竖排分隔线（仿古籍） */
+.vertical-divider {
+  position: relative;
+}
+
+.vertical-divider::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 1px;
+  background: linear-gradient(
+    to bottom,
+    transparent 0%,
+    var(--ink-sandalwood) 10%,
+    var(--ink-sandalwood) 90%,
+    transparent 100%
+  );
+}
+
+/* 竖排文字间距 */
+.vertical-text {
+  line-height: 2.2;
+  letter-spacing: 0.15em;
+}
+
+/* ========================================
+   6. 标题层级样式
+   ======================================== */
+
+/* 一级标题 - 应用名、页面标题 */
+.ink-title {
+  font-family: var(--font-wenkai);
+  font-size: 2.5rem;
+  font-weight: 400;
+  color: var(--ink-dark);
+  line-height: 1.4;
+  letter-spacing: 0.1em;
+  margin-bottom: 1.5rem;
+}
+
+/* 二级标题 - 日记标题 */
+.ink-subtitle {
+  font-family: var(--font-wenkai);
+  font-size: 1.8rem;
+  font-weight: 400;
+  color: var(--ink-dark);
+  line-height: 1.5;
+  letter-spacing: 0.08em;
+  margin-bottom: 1rem;
+}
+
+/* 三级标题 - 小节标题 */
+.ink-heading {
+  font-family: var(--font-wenkai);
+  font-size: 1.25rem;
+  font-weight: 400;
+  color: var(--ink-dark);
+  line-height: 1.6;
+  letter-spacing: 0.06em;
+  margin-bottom: 0.75rem;
+}
+
+/* 正文 */
+.ink-body {
+  font-family: var(--font-wenkai);
+  font-size: 1rem;
+  font-weight: 400;
+  color: var(--ink-dark);
+  line-height: 1.8;
+  letter-spacing: 0.05em;
+}
+
+/* 小字 */
+.ink-small {
+  font-family: var(--font-wenkai);
+  font-size: 0.875rem;
+  font-weight: 400;
+  color: var(--ink-sandalwood);
+  line-height: 1.6;
+  letter-spacing: 0.04em;
+}
+
+/* ========================================
+   7. 按钮基础样式
+   ======================================== */
+
+.ink-button {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  font-family: var(--font-wenkai);
+  font-size: 1rem;
+  letter-spacing: 0.05em;
+  background-color: var(--ink-paper);
+  color: var(--ink-dark);
+  border: 1px solid var(--ink-sandalwood);
+  border-radius: var(--radius-ink);
+  cursor: pointer;
+  overflow: hidden;
+  transition: all var(--transition-normal);
+}
+
+.ink-button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 0;
+  background-color: var(--ink-hover);
+  transition: width var(--transition-normal);
+  z-index: 0;
+}
+
+.ink-button:hover::before {
+  width: 100%;
+}
+
+.ink-button:hover {
+  border-color: var(--ink-ochre);
+}
+
+.ink-button:active {
+  transform: translateY(1px);
+}
+
+.ink-button > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* 主要按钮 */
+.ink-button-primary {
+  background-color: var(--ink-ochre);
+  color: var(--ink-paper);
+  border-color: var(--ink-ochre);
+}
+
+.ink-button-primary::before {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.ink-button-primary:hover {
+  background-color: var(--ink-ochre);
+  border-color: var(--ink-ochre);
+}
+
+/* 墨滴入水涟漪效果 */
+.ink-button-ripple {
+  position: absolute;
+  border-radius: 50%;
+  background-color: var(--ink-ochre-30);
+  transform: scale(0);
+  animation: inkRipple 0.6s ease-out;
+  pointer-events: none;
+}
+
+@keyframes inkRipple {
+  to {
+    transform: scale(4);
+    opacity: 0;
+  }
+}
+
+/* ========================================
+   8. 卡片/纸张样式
+   ======================================== */
+
+.ink-paper {
+  background-color: var(--ink-paper);
+  border-radius: var(--radius-ink);
+  box-shadow: var(--shadow-paper);
+  transition: box-shadow var(--transition-normal);
+}
+
+.ink-paper:hover {
+  box-shadow: var(--shadow-paper-lg);
+}
+
+/* 线装书页样式 */
+.ink-book-page {
+  position: relative;
+  background-color: var(--ink-paper);
+  border-left: 3px double var(--ink-rice);
+  padding-left: 1.5rem;
+  box-shadow: var(--shadow-paper);
+}
+
+.ink-book-page::before {
+  content: '';
+  position: absolute;
+  left: 0.5rem;
+  top: 10%;
+  bottom: 10%;
+  width: 1px;
+  background: repeating-linear-gradient(
+    to bottom,
+    var(--ink-sandalwood) 0px,
+    var(--ink-sandalwood) 4px,
+    transparent 4px,
+    transparent 8px
+  );
+}
+
+/* ========================================
+   9. 输入框样式
+   ======================================== */
+
+.ink-input {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  font-family: var(--font-wenkai);
+  font-size: 1rem;
+  letter-spacing: 0.05em;
+  background-color: var(--ink-paper);
+  color: var(--ink-dark);
+  border: 1px solid var(--ink-sandalwood);
+  border-radius: var(--radius-ink);
+  outline: none;
+  transition: all var(--transition-normal);
+}
+
+.ink-input::placeholder {
+  color: var(--ink-sandalwood);
+}
+
+.ink-input:focus {
+  border-color: var(--ink-ochre);
+  box-shadow: 0 0 0 3px var(--ink-ochre-10);
+}
+
+/* 文本域 */
+.ink-textarea {
+  min-height: 200px;
+  resize: vertical;
+  line-height: 1.8;
+}
+
+/* ========================================
+   10. 导航样式
+   ======================================== */
+
+.ink-nav {
+  background-color: var(--ink-hover);
+  border-right: 1px solid var(--ink-rice);
+}
+
+.ink-nav-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem 1.5rem;
+  font-family: var(--font-wenkai);
+  font-size: 1rem;
+  color: var(--ink-dark);
+  text-decoration: none;
+  transition: all var(--transition-normal);
+  position: relative;
+}
+
+.ink-nav-item::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background-color: var(--ink-ochre);
+  transform: scaleY(0);
+  transition: transform var(--transition-normal);
+}
+
+.ink-nav-item:hover,
+.ink-nav-item.active {
+  background-color: var(--ink-paper);
+  color: var(--ink-ochre);
+}
+
+.ink-nav-item.active::before {
+  transform: scaleY(1);
+}
+
+/* ========================================
+   11. 分隔线样式
+   ======================================== */
+
+.ink-divider {
+  height: 1px;
+  background: linear-gradient(
+    to right,
+    transparent 0%,
+    var(--ink-sandalwood) 20%,
+    var(--ink-sandalwood) 80%,
+    transparent 100%
+  );
+  margin: 2rem 0;
+}
+
+/* 墨迹分隔线 */
+.ink-divider-ink {
+  height: 2px;
+  background: linear-gradient(
+    to right,
+    transparent 0%,
+    var(--ink-dark) 10%,
+    var(--ink-dark) 30%,
+    var(--ink-dark-20) 50%,
+    transparent 100%
+  );
+  margin: 1.5rem 0;
+}
+
+/* ========================================
+   12. 印章样式
+   ======================================== */
+
+.ink-seal {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 3rem;
+  height: 3rem;
+  border: 2px solid var(--ink-ochre);
+  border-radius: 4px;
+  font-family: var(--font-wenkai);
+  font-size: 1.25rem;
+  color: var(--ink-ochre);
+  background-color: transparent;
+}
+
+.ink-seal-filled {
+  background-color: var(--ink-ochre);
+  color: var(--ink-paper);
+}
+
+/* ========================================
+   13. 动画工具类
+   ======================================== */
+
+.animate-fade-in {
+  animation: fadeIn 0.3s ease-out;
+}
+
+.animate-slide-up {
+  animation: slideUp 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ========================================
+   14. 工具类
+   ======================================== */
+
+/* 隐藏 */
+.hidden {
+  display: none !important;
+}
+
+/* 视觉隐藏（屏幕阅读器可访问） */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* 文本截断 */
+.text-ellipsis {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* 多行文本截断 */
+.text-ellipsis-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* ========================================
+   15. 响应式断点
+   ======================================== */
+
+@media (max-width: 768px) {
+  .ink-title {
+    font-size: 2rem;
+  }
+  
+  .ink-subtitle {
+    font-size: 1.5rem;
+  }
+  
+  .vertical-container {
+    max-height: 60vh;
+  }
+}
+
+@media (max-width: 480px) {
+  .ink-title {
+    font-size: 1.75rem;
+  }
+  
+  .ink-subtitle {
+    font-size: 1.25rem;
+  }
+  
+  html {
+    font-size: 14px;
+  }
+}
