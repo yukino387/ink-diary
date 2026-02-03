@@ -7,6 +7,8 @@ import autoprefixer from 'autoprefixer'
 
 // https://vitejs.dev/config/
 export default defineConfig({
+  // GitHub Pages 部署配置（如果使用自定义域名，改为 '/'）
+  base: '/ink-diary/',
   plugins: [
     vue(),
     VitePWA({
