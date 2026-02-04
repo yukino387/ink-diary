@@ -4,8 +4,9 @@
   "description": "墨记 - 一款融合AI功能的离线日记应用，支持生成精美HTML日记",
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "vite build",
+    "dev": "chcp 65001 > nul && vite",
+    "build": "chcp 65001 > nul && vite build",
+    "build:win": "powershell -ExecutionPolicy Bypass -File build.ps1",
     "preview": "vite preview",
     "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs --fix --ignore-path .gitignore"
   },

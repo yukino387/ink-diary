@@ -4,6 +4,7 @@ import { VitePWA } from 'vite-plugin-pwa'
 import { resolve } from 'path'
 import tailwindcss from 'tailwindcss'
 import autoprefixer from 'autoprefixer'
+import { fixEncodingPlugin } from './vite-plugin-fix-encoding.js'
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -11,6 +12,7 @@ export default defineConfig({
   base: '/ink-diary/',
   plugins: [
     vue(),
+    fixEncodingPlugin(), // 修复 Windows 中文乱码
     VitePWA({
       registerType: 'autoUpdate',
       manifest: false, // 使用自定义manifest.json
