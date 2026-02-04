@@ -1,99 +1,47 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-  <!-- »ù´¡ÔªÊı¾İ -->
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  
-  <!-- PWA ÅäÖÃ -->
   <meta name="theme-color" content="#2c3e50">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
-  <meta name="apple-mobile-web-app-title" content="Ä«¼Ç">
-  <meta name="application-name" content="Ä«¼Ç">
+  <meta name="apple-mobile-web-app-title" content="å¢¨è®°">
+  <meta name="application-name" content="å¢¨è®°">
   <meta name="msapplication-TileColor" content="#2c3e50">
-  <meta name="msapplication-config" content="/browserconfig.xml">
-  
-  <!-- SEO ÔªÊı¾İ -->
-  <meta name="description" content="Ä«¼Ç - Ò»¿îÍêÈ«ÀëÏßÔËĞĞµÄÖĞ¹ú·çHTMLÈÕ¼ÇPWAÓ¦ÓÃ£¬½«ÓÃ»§ÉÏ´«»òAIÉú³ÉµÄHTMLÍøÒ³×÷ÎªÈÕ¼Ç£¬Í¨¹ı¼«ÖÂÓÅÑÅµÄÖĞ¹ú·ç½çÃæ½øĞĞ³ÊÏÖÓë¹ÜÀí£¬´òÔìÒ»¿îË½ÃÜµÄÊı×ÖÎÄ·¿ÕäÍæ¡£">
-  <meta name="keywords" content="ÈÕ¼Ç,ÖĞ¹ú·ç,PWA,ÀëÏßÓ¦ÓÃ,HTMLÈÕ¼Ç,Ä«¼Ç,Êı×ÖÎÄ·¿">
-  <meta name="author" content="Ä«¼Ç">
-  <meta name="robots" content="index, follow">
-  
-  <!-- Open Graph ÔªÊı¾İ -->
-  <meta property="og:title" content="Ä«¼Ç - ÖĞ¹ú·çHTMLÈÕ¼Ç">
-  <meta property="og:description" content="Ò»¿îÍêÈ«ÀëÏßÔËĞĞµÄÖĞ¹ú·çHTMLÈÕ¼ÇPWAÓ¦ÓÃ">
-  <meta property="og:type" content="website">
-  <meta property="og:locale" content="zh_CN">
-  
-  <!-- Twitter ¿¨Æ¬ -->
-  <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="Ä«¼Ç - ÖĞ¹ú·çHTMLÈÕ¼Ç">
-  <meta name="twitter:description" content="Ò»¿îÍêÈ«ÀëÏßÔËĞĞµÄÖĞ¹ú·çHTMLÈÕ¼ÇPWAÓ¦ÓÃ">
-  
-  <!-- ±êÌâ -->
-  <title>Ä«¼Ç - ÖĞ¹ú·çHTMLÈÕ¼Ç</title>
-  
-  <!-- Favicon -->
+  <meta name="description" content="å¢¨è®° - ä¸€æ¬¾å®Œå…¨ç¦»çº¿è¿è¡Œçš„ä¸­å›½é£HTMLæ—¥è®°PWAåº”ç”¨">
+  <meta name="keywords" content="æ—¥è®°,ä¸­å›½é£,PWA,ç¦»çº¿åº”ç”¨,HTMLæ—¥è®°,å¢¨è®°">
+  <meta name="author" content="å¢¨è®°">
+  <title>å¢¨è®° - ä¸­å›½é£HTMLæ—¥è®°</title>
   <link rel="icon" type="image/svg+xml" href="/favicon.svg">
-  <link rel="alternate icon" type="image/png" href="/favicon.png">
-  <link rel="apple-touch-icon" sizes="180x180" href="/icons/icon-180x180.png">
-  <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#2c3e50">
-  
-  <!-- PWA Manifest -->
   <link rel="manifest" href="/manifest.json" crossorigin="use-credentials">
-  
-  <!-- Ô¤¼ÓÔØ¹Ø¼ü×ÊÔ´ -->
   <link rel="preconnect" href="https://cdn.jsdelivr.net">
-  <link rel="dns-prefetch" href="https://cdn.jsdelivr.net">
-  
-  <!-- Ô¤¼ÓÔØ×ÖÌå -->
   <link rel="preload" href="https://cdn.jsdelivr.net/npm/lxgw-wenkai-webfont@1.7.0/style.css" as="style">
-  
-  <!-- Ö÷ÌâÉ«½Å±¾£¨·ÀÖ¹ÉÁË¸£© -->
   <script>
-    // ¼ì²é²¢Ó¦ÓÃÓÃ»§Æ«ºÃµÄÖ÷Ìâ
     (function() {
       try {
         const darkMode = localStorage.getItem('InkDiary_config_darkMode')
         if (darkMode === 'true') {
           document.documentElement.classList.add('night-mode')
         }
-      } catch (e) {
-        // ºöÂÔ localStorage ´íÎó
-      }
+      } catch (e) {}
     })()
   </script>
-  
-  <!-- ¹Ø¼ü CSS£¨ÄÚÁª£© -->
   <style>
-    /* ¼ÓÔØÊ±µÄÕ¼Î»ÑùÊ½£¬·ÀÖ¹ FOUC */
-    html, body {
-      margin: 0;
-      padding: 0;
-      min-height: 100vh;
-    }
-    
+    html, body { margin: 0; padding: 0; min-height: 100vh; }
     body {
       font-family: "LXGW WenKai", "Microsoft YaHei", sans-serif;
       background-color: #fefcf5;
       color: #2c3e50;
     }
-    
-    /* Ò¹¶ÁÄ£Ê½ */
     body.night-mode {
       background-color: #1a1a1a;
       color: #c1a173;
     }
-    
-    /* ¼ÓÔØ¶¯»­ÈİÆ÷ */
     #app-loading {
       position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
+      top: 0; left: 0; right: 0; bottom: 0;
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -102,47 +50,26 @@
       z-index: 9999;
       transition: opacity 0.3s ease;
     }
-    
-    body.night-mode #app-loading {
-      background-color: #1a1a1a;
-    }
-    
+    body.night-mode #app-loading { background-color: #1a1a1a; }
     .loading-ink-drop {
-      width: 30px;
-      height: 30px;
+      width: 30px; height: 30px;
       background-color: #2c3e50;
       border-radius: 50% 50% 50% 0;
       animation: inkDrop 1.5s ease-in-out infinite;
       margin-bottom: 1rem;
     }
-    
     @keyframes inkDrop {
-      0% {
-        transform: scale(0) rotate(-45deg);
-        opacity: 1;
-      }
-      50% {
-        transform: scale(1) rotate(-45deg);
-        opacity: 0.8;
-      }
-      100% {
-        transform: scale(2) rotate(-45deg);
-        opacity: 0;
-      }
+      0% { transform: scale(0) rotate(-45deg); opacity: 1; }
+      50% { transform: scale(1) rotate(-45deg); opacity: 0.8; }
+      100% { transform: scale(2) rotate(-45deg); opacity: 0; }
     }
-    
     .loading-text {
       font-family: "LXGW WenKai", serif;
       font-size: 1.25rem;
       color: #2c3e50;
       letter-spacing: 0.1em;
     }
-    
-    body.night-mode .loading-text {
-      color: #c1a173;
-    }
-    
-    /* Ó¦ÓÃ¹ÒÔØºóÒş²Ø¼ÓÔØ¶¯»­ */
+    body.night-mode .loading-text { color: #c1a173; }
     #app:not(:empty) + #app-loading {
       opacity: 0;
       pointer-events: none;
@@ -150,69 +77,49 @@
   </style>
 </head>
 <body>
-  <!-- Vue Ó¦ÓÃ¹ÒÔØµã -->
   <div id="app"></div>
-  
-  <!-- ¼ÓÔØ¶¯»­£¨Ó¦ÓÃ¹ÒÔØºó×Ô¶¯Òş²Ø£© -->
   <div id="app-loading">
     <div class="loading-ink-drop"></div>
-    <p class="loading-text">Ä«¼Ç ¡¤ ÕıÔÚÔØÈë...</p>
+    <p class="loading-text">å¢¨è®° Â· æ­£åœ¨è½½å…¥...</p>
   </div>
-  
-  <!-- ½Å±¾ -->
   <script type="module" src="/src/main.js"></script>
-  
-  <!-- Service Worker ×¢²á£¨±¸ÓÃ·½°¸£© -->
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', function() {
         navigator.serviceWorker.register('/service-worker.js')
           .then(function(registration) {
-            console.log('[SW] Service Worker ×¢²á³É¹¦:', registration.scope);
+            console.log('[SW] Service Worker æ³¨å†ŒæˆåŠŸ:', registration.scope);
           })
           .catch(function(error) {
-            console.log('[SW] Service Worker ×¢²áÊ§°Ü:', error);
+            console.log('[SW] Service Worker æ³¨å†Œå¤±è´¥:', error);
           });
       });
     }
   </script>
-  
-  <!-- ×ÖÌå¼ÓÔØ -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lxgw-wenkai-webfont@1.7.0/style.css">
-  
-  <!-- Noscript ÌáÊ¾ -->
   <noscript>
     <style>
       #app-loading { display: none !important; }
       .noscript-warning {
-        position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        background-color: #fefcf5;
-        padding: 2rem;
+        position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+        display: flex; flex-direction: column;
+        align-items: center; justify-content: center;
+        background-color: #fefcf5; padding: 2rem;
         text-align: center;
       }
       .noscript-warning h1 {
         font-family: "LXGW WenKai", serif;
-        font-size: 2rem;
-        color: #2c3e50;
+        font-size: 2rem; color: #2c3e50;
         margin-bottom: 1rem;
       }
       .noscript-warning p {
         font-family: "LXGW WenKai", serif;
-        color: #666;
-        line-height: 1.8;
+        color: #666; line-height: 1.8;
       }
     </style>
     <div class="noscript-warning">
-      <h1>? Ä«¼Ç</h1>
-      <p>±§Ç¸£¬Ä«¼ÇĞèÒªÆôÓÃ JavaScript ²ÅÄÜÕı³£ÔËĞĞ¡£<br>ÇëÆôÓÃä¯ÀÀÆ÷µÄ JavaScript Ö§³ÖºóË¢ĞÂÒ³Ãæ¡£</p>
+      <h1>ğŸ“œ å¢¨è®°</h1>
+      <p>æŠ±æ­‰ï¼Œå¢¨è®°éœ€è¦å¯ç”¨ JavaScript æ‰èƒ½æ­£å¸¸è¿è¡Œã€‚<br>è¯·å¯ç”¨æµè§ˆå™¨çš„ JavaScript æ”¯æŒååˆ·æ–°é¡µé¢ã€‚</p>
     </div>
   </noscript>
 </body>

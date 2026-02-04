@@ -75,8 +75,8 @@
       pointer-events: none;
     }
   </style>
-  <script type="module" crossorigin src="/ink-diary/assets/main-DvxZRvhB.js"></script>
-  <link rel="stylesheet" crossorigin href="/ink-diary/assets/main-_y1q5vr_.css">
+<link rel="stylesheet" crossorigin href="/ink-diary/assets/main-_y1q5vr_.css">
+<script id="vite-plugin-pwa:register-sw" src="/ink-diary/registerSW.js"></script>
 </head>
 <body>
   <div id="app"></div>
@@ -84,10 +84,11 @@
     <div class="loading-ink-drop"></div>
     <p class="loading-text">墨记 · 正在载入...</p>
   </div>
+  <script type="module" crossorigin src="/ink-diary/assets/main-DvxZRvhB.js"></script>
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', function() {
-        navigator.serviceWorker.register('/ink-diary/sw.js')
+        navigator.serviceWorker.register('/service-worker.js')
           .then(function(registration) {
             console.log('[SW] Service Worker 注册成功:', registration.scope);
           })
