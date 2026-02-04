@@ -1,59 +1,59 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-  <!-- ����Ԫ���� -->
+  <!-- 基础元数据 -->
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  
-  <!-- PWA ���� -->
+
+  <!-- PWA 配置 -->
   <meta name="theme-color" content="#2c3e50">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
-  <meta name="apple-mobile-web-app-title" content="ī��">
-  <meta name="application-name" content="ī��">
+  <meta name="apple-mobile-web-app-title" content="墨记">
+  <meta name="application-name" content="墨记">
   <meta name="msapplication-TileColor" content="#2c3e50">
   <meta name="msapplication-config" content="/browserconfig.xml">
-  
-  <!-- SEO Ԫ���� -->
-  <meta name="description" content="ī�� - һ����ȫ�������е��й���HTML�ռ�PWAӦ�ã����û��ϴ���AI���ɵ�HTML��ҳ��Ϊ�ռǣ�ͨ���������ŵ��й��������г��������������һ��˽�ܵ������ķ����档">
-  <meta name="keywords" content="�ռ�,�й���,PWA,����Ӧ��,HTML�ռ�,ī��,�����ķ�">
-  <meta name="author" content="ī��">
+
+  <!-- SEO 元数据 -->
+  <meta name="description" content="墨记 - 一款完全离线运行的中国风HTML日记PWA应用，将用户上传或AI生成的HTML网页作为日记，通过极致优雅的中国风界面进行呈现与管理，打造一款私密的数字文房珍玩。">
+  <meta name="keywords" content="日记,中国风,PWA,离线应用,HTML日记,墨记,数字文房">
+  <meta name="author" content="墨记">
   <meta name="robots" content="index, follow">
-  
-  <!-- Open Graph Ԫ���� -->
-  <meta property="og:title" content="ī�� - �й���HTML�ռ�">
-  <meta property="og:description" content="һ����ȫ�������е��й���HTML�ռ�PWAӦ��">
+
+  <!-- Open Graph 元数据 -->
+  <meta property="og:title" content="墨记 - 中国风HTML日记">
+  <meta property="og:description" content="一款完全离线运行的中国风HTML日记PWA应用">
   <meta property="og:type" content="website">
   <meta property="og:locale" content="zh_CN">
-  
-  <!-- Twitter ��Ƭ -->
+
+  <!-- Twitter 卡片 -->
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="ī�� - �й���HTML�ռ�">
-  <meta name="twitter:description" content="һ����ȫ�������е��й���HTML�ռ�PWAӦ��">
-  
-  <!-- ���� -->
-  <title>ī�� - �й���HTML�ռ�</title>
-  
+  <meta name="twitter:title" content="墨记 - 中国风HTML日记">
+  <meta name="twitter:description" content="一款完全离线运行的中国风HTML日记PWA应用">
+
+  <!-- 标题 -->
+  <title>墨记 - 中国风HTML日记</title>
+
   <!-- Favicon -->
   <link rel="icon" type="image/svg+xml" href="/ink-diary/favicon.svg">
   <link rel="alternate icon" type="image/png" href="/favicon.png">
   <link rel="apple-touch-icon" sizes="180x180" href="/icons/icon-180x180.png">
   <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#2c3e50">
-  
+
   <!-- PWA Manifest -->
   <link rel="manifest" href="/ink-diary/assets/manifest-aKhvxL8B.json" crossorigin="use-credentials">
-  
-  <!-- Ԥ���عؼ���Դ -->
+
+  <!-- 预加载关键资源 -->
   <link rel="preconnect" href="https://cdn.jsdelivr.net">
   <link rel="dns-prefetch" href="https://cdn.jsdelivr.net">
-  
-  <!-- Ԥ�������� -->
+
+  <!-- 预加载字体 -->
   <link rel="preload" href="https://cdn.jsdelivr.net/npm/lxgw-wenkai-webfont@1.7.0/style.css" as="style">
-  
-  <!-- ����ɫ�ű�����ֹ��˸�� -->
+
+  <!-- 主题色脚本（防止闪烁） -->
   <script>
-    // ��鲢Ӧ���û�ƫ�õ�����
+    // 检查并应用用户偏好的主题
     (function() {
       try {
         const darkMode = localStorage.getItem('InkDiary_config_darkMode')
@@ -61,33 +61,33 @@
           document.documentElement.classList.add('night-mode')
         }
       } catch (e) {
-        // ���� localStorage ����
+        // 忽略 localStorage 错误
       }
     })()
   </script>
-  
-  <!-- �ؼ� CSS�������� -->
+
+  <!-- 关键 CSS（内联） -->
   <style>
-    /* ����ʱ��ռλ��ʽ����ֹ FOUC */
+    /* 加载时的占位样式，防止 FOUC */
     html, body {
       margin: 0;
       padding: 0;
       min-height: 100vh;
     }
-    
+
     body {
       font-family: "LXGW WenKai", "Microsoft YaHei", sans-serif;
       background-color: #fefcf5;
       color: #2c3e50;
     }
-    
-    /* ҹ��ģʽ */
+
+    /* 夜读模式 */
     body.night-mode {
       background-color: #1a1a1a;
       color: #c1a173;
     }
-    
-    /* ���ض������� */
+
+    /* 加载动画容器 */
     #app-loading {
       position: fixed;
       top: 0;
@@ -102,11 +102,11 @@
       z-index: 9999;
       transition: opacity 0.3s ease;
     }
-    
+
     body.night-mode #app-loading {
       background-color: #1a1a1a;
     }
-    
+
     .loading-ink-drop {
       width: 30px;
       height: 30px;
@@ -115,7 +115,7 @@
       animation: inkDrop 1.5s ease-in-out infinite;
       margin-bottom: 1rem;
     }
-    
+
     @keyframes inkDrop {
       0% {
         transform: scale(0) rotate(-45deg);
@@ -130,19 +130,19 @@
         opacity: 0;
       }
     }
-    
+
     .loading-text {
       font-family: "LXGW WenKai", serif;
       font-size: 1.25rem;
       color: #2c3e50;
       letter-spacing: 0.1em;
     }
-    
+
     body.night-mode .loading-text {
       color: #c1a173;
     }
-    
-    /* Ӧ�ù��غ����ؼ��ض��� */
+
+    /* 应用挂载后隐藏加载动画 */
     #app:not(:empty) + #app-loading {
       opacity: 0;
       pointer-events: none;
@@ -152,36 +152,36 @@
   <link rel="stylesheet" crossorigin href="/ink-diary/assets/main-_y1q5vr_.css">
 <script id="vite-plugin-pwa:register-sw" src="/ink-diary/registerSW.js"></script></head>
 <body>
-  <!-- Vue Ӧ�ù��ص� -->
+  <!-- Vue 应用挂载点 -->
   <div id="app"></div>
-  
-  <!-- ���ض�����Ӧ�ù��غ��Զ����أ� -->
+
+  <!-- 加载动画（应用挂载后自动隐藏） -->
   <div id="app-loading">
     <div class="loading-ink-drop"></div>
-    <p class="loading-text">ī�� �� ��������...</p>
+    <p class="loading-text">墨记 · 正在载入...</p>
   </div>
-  
-  <!-- �ű� -->
-  
-  <!-- Service Worker ע�ᣨ���÷����� -->
+
+  <!-- 脚本 -->
+
+  <!-- Service Worker 注册（备用方案） -->
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', function() {
         navigator.serviceWorker.register('/service-worker.js')
           .then(function(registration) {
-            console.log('[SW] Service Worker ע��ɹ�:', registration.scope);
+            console.log('[SW] Service Worker 注册成功:', registration.scope);
           })
           .catch(function(error) {
-            console.log('[SW] Service Worker ע��ʧ��:', error);
+            console.log('[SW] Service Worker 注册失败:', error);
           });
       });
     }
   </script>
-  
-  <!-- ������� -->
+
+  <!-- 字体加载 -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lxgw-wenkai-webfont@1.7.0/style.css">
-  
-  <!-- Noscript ��ʾ -->
+
+  <!-- Noscript 提示 -->
   <noscript>
     <style>
       #app-loading { display: none !important; }
@@ -212,8 +212,8 @@
       }
     </style>
     <div class="noscript-warning">
-      <h1>? ī��</h1>
-      <p>��Ǹ��ī����Ҫ���� JavaScript �����������С�<br>������������� JavaScript ֧�ֺ�ˢ��ҳ�档</p>
+      <h1>📜 墨记</h1>
+      <p>抱歉，墨记需要启用 JavaScript 才能正常运行。<br>请启用浏览器的 JavaScript 支持后刷新页面。</p>
     </div>
   </noscript>
 </body>
