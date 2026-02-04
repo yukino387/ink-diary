@@ -8,7 +8,7 @@
  * - 字体文件：Cache First（长期缓存）
  */
 
-const CACHE_NAME = 'ink-diary-v3'
+const CACHE_NAME = 'ink-diary-v3-1'
 const STATIC_ASSETS = [
   '/',
   '/index.html',

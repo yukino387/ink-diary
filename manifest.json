@@ -1,8 +1,8 @@
 ﻿{
-  "name": "澧ㄨ - 涓浗椋嶩TML鏃ヨ",
-  "short_name": "澧ㄨ",
-  "version": "3.0.0",
-  "description": "涓€娆惧畬鍏ㄧ绾胯繍琛岀殑涓浗椋嶩TML鏃ヨPWA搴旂敤锛屽皢鐢ㄦ埛涓婁紶鎴朅I鐢熸垚鐨凥TML缃戦〉浣滀负鏃ヨ锛岄€氳繃鏋佽嚧浼橀泤鐨勪腑鍥介鐣岄潰杩涜鍛堢幇涓庣鐞嗐€傜増鏈?.0.0",
+  "name": "墨记 - 中国风HTML日记",
+  "short_name": "墨记",
+  "version": "3.0.1",
+  "description": "一款完全离线运行的中国风HTML日记PWA应用，将用户上传或AI生成的HTML网页作为日记，通过极致优雅的中国风界面进行呈现与管理。版本3.0.0",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#fefcf5",
