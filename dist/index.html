@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <!-- ����Ԫ���� -->
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  
+  <!-- PWA ���� -->
+  <meta name="theme-color" content="#2c3e50">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="ī��">
+  <meta name="application-name" content="ī��">
+  <meta name="msapplication-TileColor" content="#2c3e50">
+  <meta name="msapplication-config" content="/browserconfig.xml">
+  
+  <!-- SEO Ԫ���� -->
+  <meta name="description" content="ī�� - һ����ȫ�������е��й���HTML�ռ�PWAӦ�ã����û��ϴ���AI���ɵ�HTML��ҳ��Ϊ�ռǣ�ͨ���������ŵ��й��������г��������������һ��˽�ܵ������ķ����档">
+  <meta name="keywords" content="�ռ�,�й���,PWA,����Ӧ��,HTML�ռ�,ī��,�����ķ�">
+  <meta name="author" content="ī��">
+  <meta name="robots" content="index, follow">
+  
+  <!-- Open Graph Ԫ���� -->
+  <meta property="og:title" content="ī�� - �й���HTML�ռ�">
+  <meta property="og:description" content="һ����ȫ�������е��й���HTML�ռ�PWAӦ��">
+  <meta property="og:type" content="website">
+  <meta property="og:locale" content="zh_CN">
+  
+  <!-- Twitter ��Ƭ -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="ī�� - �й���HTML�ռ�">
+  <meta name="twitter:description" content="һ����ȫ�������е��й���HTML�ռ�PWAӦ��">
+  
+  <!-- ���� -->
+  <title>ī�� - �й���HTML�ռ�</title>
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="/ink-diary/favicon.svg">
+  <link rel="alternate icon" type="image/png" href="/favicon.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/icons/icon-180x180.png">
+  <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#2c3e50">
+  
+  <!-- PWA Manifest -->
+  <link rel="manifest" href="/ink-diary/assets/manifest-aKhvxL8B.json" crossorigin="use-credentials">
+  
+  <!-- Ԥ���عؼ���Դ -->
+  <link rel="preconnect" href="https://cdn.jsdelivr.net">
+  <link rel="dns-prefetch" href="https://cdn.jsdelivr.net">
+  
+  <!-- Ԥ�������� -->
+  <link rel="preload" href="https://cdn.jsdelivr.net/npm/lxgw-wenkai-webfont@1.7.0/style.css" as="style">
+  
+  <!-- ����ɫ�ű�����ֹ��˸�� -->
+  <script>
+    // ��鲢Ӧ���û�ƫ�õ�����
+    (function() {
+      try {
+        const darkMode = localStorage.getItem('InkDiary_config_darkMode')
+        if (darkMode === 'true') {
+          document.documentElement.classList.add('night-mode')
+        }
+      } catch (e) {
+        // ���� localStorage ����
+      }
+    })()
+  </script>
+  
+  <!-- �ؼ� CSS�������� -->
+  <style>
+    /* ����ʱ��ռλ��ʽ����ֹ FOUC */
+    html, body {
+      margin: 0;
+      padding: 0;
+      min-height: 100vh;
+    }
+    
+    body {
+      font-family: "LXGW WenKai", "Microsoft YaHei", sans-serif;
+      background-color: #fefcf5;
+      color: #2c3e50;
+    }
+    
+    /* ҹ��ģʽ */
+    body.night-mode {
+      background-color: #1a1a1a;
+      color: #c1a173;
+    }
+    
+    /* ���ض������� */
+    #app-loading {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background-color: #fefcf5;
+      z-index: 9999;
+      transition: opacity 0.3s ease;
+    }
+    
+    body.night-mode #app-loading {
+      background-color: #1a1a1a;
+    }
+    
+    .loading-ink-drop {
+      width: 30px;
+      height: 30px;
+      background-color: #2c3e50;
+      border-radius: 50% 50% 50% 0;
+      animation: inkDrop 1.5s ease-in-out infinite;
+      margin-bottom: 1rem;
+    }
+    
+    @keyframes inkDrop {
+      0% {
+        transform: scale(0) rotate(-45deg);
+        opacity: 1;
+      }
+      50% {
+        transform: scale(1) rotate(-45deg);
+        opacity: 0.8;
+      }
+      100% {
+        transform: scale(2) rotate(-45deg);
+        opacity: 0;
+      }
+    }
+    
+    .loading-text {
+      font-family: "LXGW WenKai", serif;
+      font-size: 1.25rem;
+      color: #2c3e50;
+      letter-spacing: 0.1em;
+    }
+    
+    body.night-mode .loading-text {
+      color: #c1a173;
+    }
+    
+    /* Ӧ�ù��غ����ؼ��ض��� */
+    #app:not(:empty) + #app-loading {
+      opacity: 0;
+      pointer-events: none;
+    }
+  </style>
+  <script type="module" crossorigin src="/ink-diary/assets/main-DvxZRvhB.js"></script>
+  <link rel="stylesheet" crossorigin href="/ink-diary/assets/main-_y1q5vr_.css">
+<script id="vite-plugin-pwa:register-sw" src="/ink-diary/registerSW.js"></script></head>
+<body>
+  <!-- Vue Ӧ�ù��ص� -->
+  <div id="app"></div>
+  
+  <!-- ���ض�����Ӧ�ù��غ��Զ����أ� -->
+  <div id="app-loading">
+    <div class="loading-ink-drop"></div>
+    <p class="loading-text">ī�� �� ��������...</p>
+  </div>
+  
+  <!-- �ű� -->
+  
+  <!-- Service Worker ע�ᣨ���÷����� -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', function() {
+        navigator.serviceWorker.register('/service-worker.js')
+          .then(function(registration) {
+            console.log('[SW] Service Worker ע��ɹ�:', registration.scope);
+          })
+          .catch(function(error) {
+            console.log('[SW] Service Worker ע��ʧ��:', error);
+          });
+      });
+    }
+  </script>
+  
+  <!-- ������� -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lxgw-wenkai-webfont@1.7.0/style.css">
+  
+  <!-- Noscript ��ʾ -->
+  <noscript>
+    <style>
+      #app-loading { display: none !important; }
+      .noscript-warning {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        background-color: #fefcf5;
+        padding: 2rem;
+        text-align: center;
+      }
+      .noscript-warning h1 {
+        font-family: "LXGW WenKai", serif;
+        font-size: 2rem;
+        color: #2c3e50;
+        margin-bottom: 1rem;
+      }
+      .noscript-warning p {
+        font-family: "LXGW WenKai", serif;
+        color: #666;
+        line-height: 1.8;
+      }
+    </style>
+    <div class="noscript-warning">
+      <h1>? ī��</h1>
+      <p>��Ǹ��ī����Ҫ���� JavaScript �����������С�<br>������������� JavaScript ֧�ֺ�ˢ��ҳ�档</p>
+    </div>
+  </noscript>
+</body>
+</html>
