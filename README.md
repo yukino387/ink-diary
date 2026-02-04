@@ -1,6 +1,6 @@
 # 墨记 · Ink Diary
 
-> 一款本地优先的 HTML 日记应用，支持多种编辑模式
+> 一个本地优先的 HTML 日记应用，支持多种编辑模式
 
 <div align="center">
 
@@ -12,9 +12,30 @@
 </div>
 
 <div align="center">
+  <img src="https://img.shields.io/badge/在线演示-立即体验-4299e1?style=for-the-badge&logo=netlify&logoColor=white" />
+</div>
+
+<div align="center" style="margin: 20px 0;">
+  <a href="https://ink-diary.netlify.app/settings" target="_blank" style="
+    display: inline-block;
+    background: linear-gradient(135deg, #4299e1 0%, #667eea 100%);
+    color: white;
+    padding: 12px 24px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 1.1em;
+    box-shadow: 0 4px 12px rgba(66, 153, 225, 0.3);
+    transition: all 0.3s ease;
+  ">
+    🚀 立即体验在线演示
+  </a>
+</div>
+
+<div align="center">
   <img src="https://img.shields.io/badge/安全-本地加密存储-brightgreen?style=flat-square" />
   <img src="https://img.shields.io/badge/多种模式-上传/代码/可选AI-blue?style=flat-square" />
-  <img src="https://img.shields.io/badge/设计-简洁素雅-purple?style=flat-square" />
+  <img src="https://img.shields.io/badge/PWA-支持安装到桌面-purple?style=flat-square" />
 </div>
 
 ## ✨ 核心特性
@@ -23,14 +44,14 @@
 <tr>
 <td width="33%">
 
-### 📁 本地优先
-所有数据存储在本地浏览器，不使用 AI 功能时可完全离线运行。
+### 🌐 在线演示
+无需安装，立即体验所有功能：[ink-diary.netlify.app](https://ink-diary.netlify.app/settings)
 
 </td>
 <td width="33%">
 
-### 🔐 数据加密
-使用现代加密算法保护您的日记内容，确保隐私安全。
+### 📁 本地优先
+所有数据存储在本地浏览器，不使用 AI 功能时可完全离线运行。
 
 </td>
 <td width="33%">
@@ -42,58 +63,16 @@
 </tr>
 </table>
 
-## 🎨 设计理念
+## 🚀 立即开始
 
-### 色彩体系
-简洁、专注的配色方案，适合长时间书写和阅读
+### 方式一：在线体验（推荐）
+1. 访问 [https://ink-diary.netlify.app/settings](https://ink-diary.netlify.app/settings)
+2. 查看设置页面，了解应用功能
+3. 点击左上角菜单进入日记阁
+4. 开始创建和管理您的日记
 
-<div align="center">
-  <table>
-  <tr>
-    <td align="center" width="100">
-      <div style="width: 60px; height: 60px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px;"></div>
-      <br><b>主背景色</b><br>#f8fafc
-    </td>
-    <td align="center" width="100">
-      <div style="width: 60px; height: 60px; background: #2d3748; border: 1px solid #e2e8f0; border-radius: 8px;"></div>
-      <br><b>重点色</b><br>#2d3748
-    </td>
-    <td align="center" width="100">
-      <div style="width: 60px; height: 60px; background: #4a5568; border: 1px solid #e2e8f0; border-radius: 8px;"></div>
-      <br><b>次重点色</b><br>#4a5568
-    </td>
-    <td align="center" width="100">
-      <div style="width: 60px; height: 60px; background: #718096; border: 1px solid #e2e8f0; border-radius: 8px;"></div>
-      <br><b>辅助色</b><br>#718096
-    </td>
-  </tr>
-  </table>
-</div>
-
-### 字体
-- **主字体**: 系统默认字体栈，确保最佳可读性
-- **备用字体**: [霞鹜文楷](https://github.com/lxgw/LxgwWenKai)（可选安装）
-
-## 🚀 快速开始
-
-### 方法一：使用批处理文件（推荐）
-
-#### 🟢 简单启动（已安装 Node.js）
-```bash
-双击运行 `启动墨记应用.bat`
-```
-
-#### 🟡 完整启动（未安装 Node.js）
-```bash
-双击运行 `start-ink-diary.bat`
-```
-> 自动检测并安装所需环境
-
-### 方法二：手动启动
-
-#### 环境要求
-- Node.js 18.0+
-- npm 8.0+
+### 方式二：本地安装
+如果您希望完全控制数据，可以在本地运行：
 
 ```bash
 # 克隆项目
@@ -103,333 +82,278 @@ cd ink-diary
 # 安装依赖
 npm install
 
-# 启动开发服务器
+# 启动本地服务器
 npm run dev
 
-# 构建生产版本
-npm run build
-
-# 预览生产构建
-npm run preview
+# 访问 http://localhost:5173
 ```
 
-## 📱 功能模块
+### 方式三：PWA 安装
+1. 访问在线演示页面
+2. 在浏览器菜单中选择"安装应用"
+3. 添加到桌面或应用列表
+4. 像原生应用一样使用
 
-### 📚 日记列表 (DiaryList)
-- 网格/列表展示所有日记
-- 智能搜索与排序
-- 内容预览与快速访问
+## 📱 功能亮点
 
-### 👁️ 日记阅读器 (DiaryReader)
-- 安全沙盒渲染 HTML 内容
-- 简洁的阅读界面
-- 编辑和管理入口
-- 上一篇/下一篇导航
+<div align="center">
+  <table>
+  <tr>
+    <td align="center">
+      <h4>🏮 日记阁</h4>
+      <p>网格/列表展示所有日记<br>智能搜索与排序</p>
+    </td>
+    <td align="center">
+      <h4>📖 阅读器</h4>
+      <p>安全沙盒渲染<br>简洁阅读体验</p>
+    </td>
+    <td align="center">
+      <h4>✍️ 编辑器</h4>
+      <p>三种编辑模式<br>实时预览</p>
+    </td>
+    <td align="center">
+      <h4>⚙️ 设置</h4>
+      <p>AI配置管理<br>数据备份恢复</p>
+    </td>
+  </tr>
+  </table>
+</div>
 
-### ✍️ 日记编辑器 (DiaryEditor)
-<table>
-<tr>
-<td width="33%">
+## 🎨 设计理念
 
-#### 上传模式
-- 拖拽或选择 HTML 文件
-- 自动提取内容预览
-- 支持文件批量上传
+### 简洁实用的界面
+- 清晰的功能分区
+- 直观的操作流程
+- 响应式布局，适配各种设备
 
-</td>
-<td width="33%">
+### 颜色方案
+<div align="center">
+  <table>
+  <tr>
+    <td align="center" width="100">
+      <div style="width: 60px; height: 60px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px;"></div>
+      <br><b>背景色</b><br>#f8fafc
+    </td>
+    <td align="center" width="100">
+      <div style="width: 60px; height: 60px; background: #2d3748; border: 1px solid #e2e8f0; border-radius: 8px;"></div>
+      <br><b>主色</b><br>#2d3748
+    </td>
+    <td align="center" width="100">
+      <div style="width: 60px; height: 60px; background: #4a5568; border: 1px solid #e2e8f0; border-radius: 8px;"></div>
+      <br><b>辅色</b><br>#4a5568
+    </td>
+  </tr>
+  </table>
+</div>
 
-#### 代码模式
-- 直接编写 HTML/CSS/JS
-- 实时预览效果
-- 代码高亮和格式化
-
-</td>
-<td width="33%">
-
-#### AI 模式（可选）
-- 需要配置 API 密钥
-- 辅助内容润色
-- 可自定义提示词
-
-</td>
-</tr>
-</table>
-
-### ⚙️ 设置 (Settings)
-- **AI 配置**（可选）：Base URL、API Key、模型选择
-- **本地安全**：设置加密密码，保护数据隐私
-- **数据管理**：加密导出/导入、清空数据
-
-## 🔐 安全架构
+## 🔐 安全特性
 
 <table>
 <tr>
 <td>
 
-### 🛡️ 本地数据加密
-- 日记内容使用 **AES-GCM** 算法加密
-- API Key 等敏感信息单独加密存储
-- 可选的密码保护功能
+### 🛡️ 本地加密
+- 日记内容 AES-GCM 加密
+- 敏感信息单独保护
+- 可选密码保护功能
 
 </td>
 <td>
 
-### 📦 数据存储策略
-- 所有数据存储在 **IndexedDB**
-- 沙盒隔离渲染用户 HTML 内容
-- 加密备份使用 PBKDF2 派生密钥
+### 📦 数据自主
+- 所有数据存储在本地
+- 支持加密备份导出
+- 智能合并导入数据
 
 </td>
 </tr>
 </table>
 
-### 🔒 加密备份流程
-```mermaid
-graph LR
-    A[用户密码] --> B(PBKDF2 派生密钥)
-    B --> C{AES-GCM 加密}
-    D[日记数据] --> C
-    C --> E[加密备份文件]
-```
+## 📝 快速指南
 
-## 📝 使用指南
+### 在线演示使用
+1. **访问应用**：[https://ink-diary.netlify.app/settings](https://ink-diary.netlify.app/settings)
+2. **了解功能**：在设置页面查看所有配置选项
+3. **开始使用**：点击左上角菜单进入日记阁
+4. **创建日记**：选择您喜欢的编辑模式
 
-### 离线使用流程
-1. **下载应用** → 构建后可作为 PWA 安装到桌面
-2. **创建日记** → 使用上传或代码模式
-3. **编辑内容** → 完全本地操作，无需网络
-4. **阅读管理** → 所有功能均可离线使用
+### 编辑模式选择
 
-### AI 功能说明
+| 模式 | 适合场景 | 网络需求 |
+|------|---------|---------|
+| **上传模式** | 已有HTML文件 | 仅上传时需要 |
+| **代码模式** | 自定义设计 | 不需要 |
+| **AI模式** | 内容辅助 | 需要 |
+
+### 数据管理
 ```yaml
-AI功能:
-  性质: 可选附加功能
-  要求: 需配置有效的API密钥
-  网络: 使用时需要互联网连接
-  注意: 不使用AI功能时可完全离线运行
+备份流程:
+  1. 设置 → 数据管理 → 导出
+  2. 设置备份密码
+  3. 下载加密文件
+  
+恢复流程:
+  1. 选择加密备份文件
+  2. 输入密码
+  3. 自动合并数据
 ```
 
-### 数据备份与恢复
-<table>
-<tr>
-<td>
+## 🌟 特色功能
 
-#### 📤 加密导出
-1. 进入"设置" → "数据管理"
-2. 点击"导出"
-3. 设置导出密码（至少6位）
-4. 下载加密备份文件
+### 1. 离线优先架构
+```javascript
+// 完全离线的工作流程
+if (不使用AI功能) {
+  所有操作都在本地完成
+  无需网络连接
+  数据加密存储在浏览器
+} else {
+  需要网络连接AI服务
+  其他功能仍可离线使用
+}
+```
 
-</td>
-<td>
+### 2. 智能数据合并
+- **新增**：不存在的内容直接添加
+- **更新**：较新的内容覆盖旧内容
+- **保留**：较旧的内容保持不变
 
-#### 📥 密码导入
-1. 选择加密备份文件
-2. 输入解密密码
-3. 系统智能合并重复内容
-4. 查看导入结果统计
+### 3. 安全沙盒渲染
+```html
+<iframe sandbox="allow-scripts allow-same-origin">
+  <!-- 用户HTML内容在这里安全渲染 -->
+</iframe>
+```
 
-</td>
-</tr>
-</table>
-
-### 三种编辑模式对比
-
-| 功能特性 | 上传模式 | 代码模式 | AI模式 |
-|---------|---------|---------|--------|
-| 网络需求 | 不需要 | 不需要 | 需要 |
-| 技术要求 | 低 | 中 | 低 |
-| 灵活性 | 中 | 高 | 中 |
-| 内容来源 | 现有HTML文件 | 手工编写 | AI生成+编辑 |
-| 完全离线 | ✓ | ✓ | ✗ |
-
-## 🛠️ 技术栈
+## 🔧 技术栈
 
 <div align="center">
   <img src="https://skillicons.dev/icons?i=vue,vite,tailwind,js,html,css" />
 </div>
 
-- **框架**: Vue 3 (Composition API)
+- **前端框架**: Vue 3 + Composition API
 - **构建工具**: Vite
-- **样式**: Tailwind CSS
+- **样式方案**: Tailwind CSS
 - **状态管理**: Pinia
-- **数据存储**: localForage
-- **加密**: Web Crypto API
-- **PWA**: Vite PWA Plugin
+- **本地存储**: localForage (IndexedDB)
+- **加密算法**: Web Crypto API
+- **部署平台**: Netlify
 
-## 📁 项目结构
+## 📊 在线演示详情
 
+### 访问地址
+**主应用**: [https://ink-diary.netlify.app](https://ink-diary.netlify.app)
+
+**设置页面**: [https://ink-diary.netlify.app/settings](https://ink-diary.netlify.app/settings)
+
+### 演示功能
+- ✅ 完整功能体验
+- ✅ 本地数据存储
+- ✅ 加密功能演示
+- ✅ PWA 安装测试
+- ✅ 多设备同步测试
+
+### 限制说明
+```yaml
+在线演示限制:
+  数据存储: 仅在当前浏览器有效
+  清除缓存: 会丢失所有数据
+  AI功能: 需要自行配置API密钥
+  备份文件: 下载到本地保存
 ```
-ink-diary/
-├── public/              # 静态资源
-├── src/
-│   ├── assets/         # 样式与字体
-│   ├── components/     # 组件库
-│   ├── modules/        # 核心模块
-│   │   ├── db.js      # IndexedDB 操作
-│   │   ├── ai-client.js # AI API 调用（可选）
-│   │   └── crypto.js  # 加密模块
-│   └── views/         # 页面视图
-├── manifest.json       # PWA 配置
-├── service-worker.js   # 离线缓存
-└── vite.config.js     # 构建配置
-```
 
-## ⚠️ 重要声明
+## ⚠️ 重要说明
 
-<div align="center" style="background: #f8f9fa; border: 1px solid #e9ecef; border-radius: 8px; padding: 20px; margin: 20px 0;">
-
-### ⚠️ 核心说明
-
-**关于离线功能和 AI 功能的明确说明：**
-
+<div align="center" style="background: #f8f9fa; border-left: 4px solid #4299e1; padding: 15px; margin: 20px 0; text-align: left;">
+  <h4 style="margin: 0 0 10px 0; color: #2d3748;">🌐 网络连接说明</h4>
+  <p style="margin: 0; color: #4a5568;">
+    1. <strong>不使用 AI 功能时可完全离线运行</strong><br>
+    2. 所有数据存储在本地浏览器<br>
+    3. AI 功能需要网络连接和 API 密钥<br>
+    4. 在线演示数据仅存储在您当前浏览器中
+  </p>
 </div>
 
-### 🌐 网络连接说明
+### 数据安全提醒
+1. **在线演示**：数据仅存储在您当前浏览器，清除缓存会丢失
+2. **本地运行**：数据完全由您控制，可定期备份
+3. **PWA安装**：安装后可像原生应用一样离线使用
 
-1. **完全离线模式**：
-   - **不使用 AI 功能时**：本应用可完全离线运行
-   - 所有数据存储在本地浏览器
-   - 所有编辑、阅读、管理功能无需网络
-   - 加密备份功能也完全离线运行
+### 浏览器兼容性
+- **推荐**：Chrome 80+, Firefox 75+, Safari 14+
+- **功能**：IndexedDB, Web Crypto API, Service Worker
+- **移动端**：支持响应式设计，可在手机和平板上使用
 
-2. **AI 功能网络要求**：
-   - **需要互联网连接**
-   - 需要有效的 API 密钥
-   - 需要访问 AI 服务提供商的服务器
-   - 不使用 AI 功能时不会产生网络流量
+## 🛠️ 开发与部署
 
-### 🛡️ 安全与隐私说明
+### 本地开发
+```bash
+# 克隆项目
+git clone [项目地址]
+cd ink-diary
 
-#### 数据存储安全
-1. **本地存储**：
-   - 所有日记内容存储在您的浏览器 IndexedDB 中
-   - 数据不会自动同步到云端
-   - 清除浏览器数据将删除所有日记
+# 安装依赖
+npm install
 
-2. **加密保护**：
-   - 支持本地加密存储敏感内容
-   - 加密备份可设置独立密码
-   - 即使不设置密码，也使用应用内置密钥加密
-
-#### 隐私保护
-1. **AI 功能隐私**：
-   - AI 请求直接从您的浏览器发送到 API 服务商
-   - 不经过任何第三方服务器
-   - 建议不要在 AI 请求中包含敏感信息
-
-2. **内容安全**：
-   - 用户上传的 HTML 在沙盒中渲染
-   - 防止恶意脚本影响主应用
-   - 建议仅上传可信任的来源
-
-### 🤖 AI 功能使用说明
-
-#### 功能定位
-- AI 功能为**可选附加功能**
-- 主要编辑模式为上传和代码编辑
-- AI 功能旨在辅助创作，非核心功能
-
-#### 使用建议
-```markdown
-推荐使用场景：
-1. 文本润色和结构调整
-2. 内容灵感激发
-3. 格式美化建议
-
-不建议用于：
-1. 处理高度敏感信息
-2. 生成法律、医疗等专业内容
-3. 替代人工校对和审核
+# 启动开发服务器
+npm run dev
+# 访问 http://localhost:5173
 ```
 
-### 💻 技术注意事项
+### 构建部署
+```bash
+# 构建生产版本
+npm run build
 
-#### 浏览器要求
-1. **现代浏览器**：
-   - Chrome 80+
-   - Firefox 75+
-   - Safari 14+
-   - Edge 80+
+# 预览构建结果
+npm run preview
 
-2. **功能支持**：
-   - IndexedDB 支持数据存储
-   - Web Crypto API 支持加密功能
-   - Service Worker 支持 PWA 功能
-
-#### 数据兼容性
-1. **导入导出**：
-   - 使用标准 JSON 格式
-   - AES-GCM 加密保护
-   - 兼容未来版本的数据迁移
-
-2. **文件格式**：
-   - 支持标准 HTML 文件
-   - 保持原始代码格式
-   - 支持常见 CSS 和 JavaScript
-
-### 📊 功能对比表
-
-| 特性 | 上传模式 | 代码模式 | AI模式 |
-|-----|---------|---------|--------|
-| **网络要求** | 不需要 | 不需要 | 需要 |
-| **数据存储** | 本地加密 | 本地加密 | 本地加密+网络请求 |
-| **隐私保护** | 高 | 高 | 中等（取决于API提供商） |
-| **技术要求** | 低 | 中 | 低 |
-| **完全离线** | ✓ | ✓ | ✗ |
-| **推荐用途** | 已有HTML内容 | 自定义开发 | 内容辅助 |
-
-### ⚖️ 责任与义务
-
-#### 用户责任
-1. **数据备份**：
-   - 用户需自行定期备份重要数据
-   - 建议使用加密导出功能创建备份
-   - 重要数据建议多设备备份
-
-2. **内容审查**：
-   - 对上传或创建的内容负全部责任
-   - AI 生成内容需人工审核
-   - 遵守当地法律法规
-
-#### 开发者声明
-1. **功能保证**：
-   - 不保证服务永久可用
-   - 不保证数据绝对安全
-   - 不提供技术支持承诺
-
-2. **变更权利**：
-   - 保留修改功能的权力
-   - 可能停止维护或更新
-   - 建议用户自行 fork 版本
-
-### 🚨 使用建议
-
-```yaml
-最佳实践:
-  1. 重要数据定期备份
-  2. 使用强密码保护加密文件
-  3. 不使用AI功能时可断开网络
-  4. 在安全环境中处理敏感内容
-  5. 测试备份文件的恢复功能
-
-风险提示:
-  - 浏览器数据可能被清除
-  - 设备损坏可能导致数据丢失
-  - AI服务可能变更或停止
-  - 加密技术可能存在未知漏洞
+# 部署到Netlify（自动）
+# 1. 推送代码到GitHub
+# 2. 在Netlify连接仓库
+# 3. 自动构建和部署
 ```
 
-### 📄 用户确认
+### 自定义配置
+```javascript
+// vite.config.js 中的关键配置
+export default defineConfig({
+  base: '/', // 部署路径
+  build: {
+    outDir: 'dist', // 输出目录
+  },
+  plugins: [
+    vue(),
+    VitePWA({
+      // PWA 配置
+      registerType: 'autoUpdate',
+      // ... 其他配置
+    })
+  ]
+})
+```
 
-**使用本应用前，请确认您已理解：**
+## 📞 反馈与支持
 
-1. ✓ 不使用 AI 功能时可完全离线运行
-2. ✓ 所有数据存储在本地，清除浏览器数据将丢失
-3. ✓ AI 功能需要网络连接和 API 密钥
-4. ✓ 加密功能提供基础保护，但不能保证绝对安全
-5. ✓ 您需要对备份数据负责
+### 问题反馈
+如果您在使用在线演示时发现问题：
+1. 检查浏览器控制台是否有错误
+2. 清除浏览器缓存后重试
+3. 在不同的浏览器中测试
+
+### 功能建议
+欢迎通过以下方式提出建议：
+1. GitHub Issues（如果开源）
+2. 项目讨论区
+3. 直接联系开发者
+
+### 自行部署
+如果您需要：
+1. 完全控制数据
+2. 定制化功能
+3. 私有化部署
+
+建议克隆项目到本地运行或部署到自己的服务器。
 
 ## 📄 许可证
 
@@ -448,12 +372,12 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND...
 
 <div align="center">
   
-感谢以下开源项目：
+感谢使这个项目成为可能的开源技术：
 
 [![Vue.js](https://img.shields.io/badge/框架-Vue.js-42b883?style=flat-square&logo=vuedotjs&logoColor=white)](https://vuejs.org/)
 [![Vite](https://img.shields.io/badge/构建-Vite-646cff?style=flat-square&logo=vite&logoColor=white)](https://vitejs.dev/)
 [![Tailwind CSS](https://img.shields.io/badge/样式-TailwindCSS-06b6d4?style=flat-square&logo=tailwindcss&logoColor=white)](https://tailwindcss.com/)
-[![localForage](https://img.shields.io/badge/存储-localForage-FF6B6B?style=flat-square&logo=indexeddb&logoColor=white)](https://localforage.github.io/localForage/)
+[![Netlify](https://img.shields.io/badge/部署-Netlify-00C7B7?style=flat-square&logo=netlify&logoColor=white)](https://netlify.com/)
 
 </div>
 
@@ -461,16 +385,56 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND...
 
 <div align="center">
   <h3 style="color: #2d3748; font-weight: 600; margin-bottom: 10px;">
-    专注记录 · 简单可靠
+    📝 立即开始您的数字日记之旅
   </h3>
+  
+  <div style="margin: 20px 0;">
+    <a href="https://ink-diary.netlify.app/settings" target="_blank" style="
+      display: inline-block;
+      background: linear-gradient(135deg, #4299e1 0%, #667eea 100%);
+      color: white;
+      padding: 12px 32px;
+      border-radius: 8px;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 1.1em;
+      box-shadow: 0 4px 15px rgba(66, 153, 225, 0.3);
+      transition: all 0.3s ease;
+      margin: 0 10px;
+    ">
+      🚀 访问在线演示
+    </a>
+    
+    <a href="https://github.com/yourusername/ink-diary" target="_blank" style="
+      display: inline-block;
+      background: #f8fafc;
+      color: #2d3748;
+      padding: 12px 32px;
+      border-radius: 8px;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 1.1em;
+      border: 2px solid #e2e8f0;
+      transition: all 0.3s ease;
+      margin: 0 10px;
+    ">
+      💻 查看源代码
+    </a>
+  </div>
+  
   <p style="font-size: 0.9em; color: #718096; max-width: 600px; margin: 0 auto;">
     一个简单但强大的本地日记工具，在需要时提供AI辅助，
-    在不需要时完全离线工作。
+    在不需要时完全离线工作。在线演示可直接体验，本地部署可完全控制数据。
   </p>
   
-  <hr style="border: none; height: 1px; background: linear-gradient(to right, transparent, #e2e8f0, transparent); margin: 20px 0;">
+  <hr style="border: none; height: 1px; background: linear-gradient(to right, transparent, #e2e8f0, transparent); margin: 20px auto; width: 80%;">
   
-  <p style="font-size: 0.8em; color: #a0aec0;">
-    📝 优先本地 · 可选AI · 数据自主
-  </p>
+  <div style="font-size: 0.8em; color: #a0aec0;">
+    <p>📱 支持 PWA 安装到桌面 · 🔐 本地加密存储 · 🌐 在线演示随时体验</p>
+    <p>💡 提示：在线演示数据仅存储在您当前浏览器中，建议重要数据定期备份</p>
+  </div>
 </div>
+
+---
+
+**开始记录** · **自主控制** · **专注创作**
