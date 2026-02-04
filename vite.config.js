@@ -6,10 +6,21 @@ import tailwindcss from 'tailwindcss'
 import autoprefixer from 'autoprefixer'
 import { fixEncodingPlugin } from './vite-plugin-fix-encoding.js'
 
+// 根据环境变量判断部署目标
+// GITHUB_PAGES: GitHub Pages (子路径 /ink-diary/)
+// NETLIFY: Netlify (根路径 /)
+// 默认: 根路径 /
+const getBase = () => {
+  if (process.env.DEPLOY_TARGET === 'github') {
+    return '/ink-diary/'
+  }
+  // Netlify 或其他平台使用根路径
+  return '/'
+}
+
 // https://vitejs.dev/config/
 export default defineConfig({
-  // GitHub Pages 部署配置（如果使用自定义域名，改为 '/'）
-  base: '/ink-diary/',
+  base: getBase(),
   plugins: [
     vue(),
     fixEncodingPlugin(), // 修复 Windows 中文乱码
