@@ -1,0 +1,12 @@
+/manifest.json
+  Content-Type: application/manifest+json
+  Access-Control-Allow-Origin: *
+
+/service-worker.js
+  Cache-Control: no-cache
+
+/*.js
+  Cache-Control: public, max-age=31536000
+
+/*.css
+  Cache-Control: public, max-age=31536000
