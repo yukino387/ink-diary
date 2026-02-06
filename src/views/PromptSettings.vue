@@ -1479,7 +1479,7 @@ function insertVariable(field, variable) {
 // 导出提示词
 function exportPrompts() {
   const data = {
-    version: '3.0.0',
+    version: '3.2.0',
     exportTime: new Date().toISOString(),
     prompts: JSON.parse(JSON.stringify(prompts)),
     aiSearchConfig: {

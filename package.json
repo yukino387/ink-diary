@@ -1,6 +1,6 @@
 {
   "name": "ink-diary",
-  "version": "3.1.0",
+  "version": "3.2.0",
   "description": "墨记 - 一款融合AI智能搜索的离线日记应用，支持自然语言查询、生成精美HTML日记",
   "type": "module",
   "scripts": {

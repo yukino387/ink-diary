@@ -57,7 +57,7 @@ try {
   // 替换脚本和样式链接
   if (scriptMatch) {
     newContent = newContent.replace(
-      /<script type="module" src="\/src\/main\.js"><\/script>/,
+      /<script type="module" src="\/src\/main\.js[^"]*"><\/script>/,
       scriptMatch[0]
     )
   }

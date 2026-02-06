@@ -144,5 +144,5 @@ app.config.errorHandler = (err, instance, info) => {
 app.mount('#app')
 
 console.log('[App] 墨记应用已启动')
-console.log('[App] 版本: 3.0.0')
+console.log('[App] 版本: 3.2.0')
 console.log('[App] 技术栈: Vue 3 + Vite + Tailwind CSS')

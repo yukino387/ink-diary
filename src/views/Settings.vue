@@ -528,7 +528,7 @@
               <span class="logo-icon">墨</span>
             </div>
             <h3>墨记</h3>
-            <span class="version-badge">v3.0.0</span>
+            <span class="version-badge">v3.2.0</span>
           </div>
           
           <div class="about-description serious">
@@ -634,7 +634,7 @@
             </div>
           </div>
 
-          <p class="copyright">墨记 Ink Diary v3.0.0 · MIT License · 部分代码由 AI 辅助生成</p>
+          <p class="copyright">墨记 Ink Diary v3.2.0 · MIT License · 部分代码由 AI 辅助生成</p>
         </div>
       </section>
     </div>

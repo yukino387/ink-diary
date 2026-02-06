@@ -4,7 +4,7 @@
 
 <div align="center">
 
-![版本](https://img.shields.io/badge/版本-3.1.0-4a5568?style=for-the-badge&logo=book&logoColor=white)
+![版本](https://img.shields.io/badge/版本-3.2.0-4a5568?style=for-the-badge&logo=book&logoColor=white)
 ![技术栈](https://img.shields.io/badge/技术栈-Vue3+Vite+Tailwind-2d3748?style=for-the-badge&logo=vue.js&logoColor=white)
 ![许可证](https://img.shields.io/badge/许可证-MIT-4a5568?style=for-the-badge&logo=opensourceinitiative&logoColor=white)
 ![离线](https://img.shields.io/badge/离线-本地优先-718096?style=for-the-badge&logo=offline&logoColor=white)
@@ -660,6 +660,14 @@ SOFTWARE.
 ```
 
 ## 📜 更新日志
+
+### v3.2.0 (2025-02-07)
+
+- 🔒 **隐私保护强化**
+  - 严谨说明：除 AI 功能外，所有功能均无需联网
+  - 上传模式、代码模式、日记管理、数据存储等核心功能完全离线可用
+  - AI 功能为可选附加功能，仅在用户主动配置 API 密钥并使用时才需要网络连接
+  - 所有数据本地存储，绝不上传至任何服务器
 
 ### v3.1.0 (2025-02-06)
 
