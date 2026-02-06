@@ -1,13 +1,14 @@
 # 墨记 · Ink Diary
 
-> 一个本地优先的 HTML 日记应用，支持多种编辑模式
+> 一个本地优先的 HTML 日记应用，支持多种编辑模式与 AI 智能搜索
 
 <div align="center">
 
-![版本](https://img.shields.io/badge/版本-3.0.0-4a5568?style=for-the-badge&logo=book&logoColor=white)
+![版本](https://img.shields.io/badge/版本-3.1.0-4a5568?style=for-the-badge&logo=book&logoColor=white)
 ![技术栈](https://img.shields.io/badge/技术栈-Vue3+Vite+Tailwind-2d3748?style=for-the-badge&logo=vue.js&logoColor=white)
 ![许可证](https://img.shields.io/badge/许可证-MIT-4a5568?style=for-the-badge&logo=opensourceinitiative&logoColor=white)
 ![离线](https://img.shields.io/badge/离线-本地优先-718096?style=for-the-badge&logo=offline&logoColor=white)
+![AI](https://img.shields.io/badge/AI-智能搜索-4299e1?style=for-the-badge&logo=openai&logoColor=white)
 
 </div>
 
@@ -36,9 +37,11 @@
   <img src="https://img.shields.io/badge/安全-本地加密存储-brightgreen?style=flat-square" />
   <img src="https://img.shields.io/badge/多种模式-上传/代码/可选AI-blue?style=flat-square" />
   <img src="https://img.shields.io/badge/PWA-支持安装到桌面-purple?style=flat-square" />
+  <img src="https://img.shields.io/badge/AI搜索-快速/深度模式-orange?style=flat-square" />
 </div>
 
 ## 📋 目录
+
 - [✨ 核心特性](#-核心特性)
 - [🚀 立即开始](#-立即开始)
 - [🎨 设计理念](#-设计理念)
@@ -53,22 +56,32 @@
 
 <table>
 <tr>
-<td width="33%">
+<td width="25%">
 
 ### 🌐 在线演示
+
 无需安装，立即体验所有功能：[ink-diary.netlify.app](https://ink-diary.netlify.app/settings)
 
 </td>
-<td width="33%">
+<td width="25%">
 
 ### 📁 本地优先
+
 所有数据存储在本地浏览器，不使用 AI 功能时可完全离线运行。
 
 </td>
-<td width="33%">
+<td width="25%">
 
 ### 🎯 多模式编辑
+
 支持上传 HTML、直接编码，以及可选的 AI 辅助功能。
+
+</td>
+<td width="25%">
+
+### 🔍 AI 智能搜索
+
+支持自然语言搜索日记，快速/深度两种模式，智能理解时间、标签、内容。
 
 </td>
 </tr>
@@ -77,12 +90,14 @@
 ## 🚀 立即开始
 
 ### 方式一：在线体验（推荐）
+
 1. 访问 [https://ink-diary.netlify.app/settings](https://ink-diary.netlify.app/settings)
 2. 查看设置页面，了解应用功能
 3. 点击左上角菜单进入日记阁
 4. 开始创建和管理您的日记
 
 ### 方式二：本地安装
+
 如果您希望完全控制数据，可以在本地运行：
 
 ```bash
@@ -104,6 +119,7 @@ npm run preview
 ```
 
 ### 方式三：PWA 安装
+
 1. 访问在线演示页面
 2. 在浏览器菜单中选择"安装应用"
 3. 添加到桌面或应用列表
@@ -112,24 +128,29 @@ npm run preview
 ### 方法四：使用批处理文件
 
 #### 🟢 简单启动（已安装 Node.js）
+
 ```bash
 双击运行 `启动墨记应用.bat`
 ```
 
 #### 🟡 完整启动（未安装 Node.js）
+
 ```bash
 双击运行 `start-ink-diary.bat`
 ```
+
 > 自动检测并安装所需环境
 
 ## 🎨 设计理念
 
 ### 简洁实用的界面
+
 - 清晰的功能分区
 - 直观的操作流程
 - 响应式布局，适配各种设备
 
 ### 颜色方案
+
 <div align="center">
   <table>
   <tr>
@@ -152,22 +173,26 @@ npm run preview
 ## 📱 功能模块
 
 ### 🏮 日记阁 (DiaryList)
+
 - 网格/列表展示所有日记
 - 智能搜索与排序
 - 内容预览与快速访问
 
 ### 📖 日记阅读器 (DiaryReader)
+
 - 安全沙盒渲染 HTML 内容
 - 简洁的阅读界面
 - 编辑和管理入口
 - 上一篇/下一篇导航
 
 ### ✍️ 日记编辑器 (DiaryEditor)
+
 <table>
 <tr>
 <td width="33%">
 
 #### 上传模式
+
 - 拖拽或选择 HTML 文件
 - 自动提取内容预览
 - 支持文件批量上传
@@ -176,6 +201,7 @@ npm run preview
 <td width="33%">
 
 #### 代码模式
+
 - 直接编写 HTML/CSS/JS
 - 实时预览效果
 - 代码高亮和格式化
@@ -184,6 +210,7 @@ npm run preview
 <td width="33%">
 
 #### AI 模式（可选）
+
 - 需要配置 API 密钥
 - 辅助内容润色
 - 可自定义提示词
@@ -192,10 +219,37 @@ npm run preview
 </tr>
 </table>
 
+### 🔍 AI 智能搜索 (AI Search)
+
+- **快速模式**：3-5次 API 调用，适合日常快速查找
+  - 意图分析：识别搜索意图（查找/统计/总结/时间线/回答/对比）
+  - 标签匹配：智能匹配相关标签
+  - 关键词生成：生成核心词及同义词
+  - 分层本地搜索：标签→标题→全文
+  - AI 相关度分析：智能评分排序
+- **深度模式**：6+次 API 调用，适合复杂查询
+  - 包含快速搜索所有步骤
+  - 正文深度分析：提取关键信息、实体识别
+  - 自我验证与补充搜索：模型自主决定搜索策略
+  - 意图结果处理：根据意图类型生成相应输出
+  - 详细报告生成：搜索概况、主要发现、时间线、统计数据
+
+- **自然语言理解**：
+  - 时间表达式解析：今天、昨天、上周、最近N天、具体日期等
+  - 实体识别：标签、心情、地点、人物、事件
+  - 多意图支持：搜索、统计、总结、时间线、问答、对比
+
+- **AI 对话控制台**：
+  - 查看完整搜索对话历史
+  - 透明化搜索过程
+  - 支持导出和筛选
+
 ### ⚙️ 设置 (Settings)
+
 - **AI 配置**（可选）：Base URL、API Key、模型选择
 - **本地安全**：设置加密密码，保护数据隐私
 - **数据管理**：加密导出/导入、清空数据
+- **提示词设置**：自定义 AI 搜索各步骤的提示词
 
 ## 🔐 安全特性
 
@@ -204,6 +258,7 @@ npm run preview
 <td>
 
 ### 🛡️ 本地加密
+
 - 日记内容使用 **AES-GCM** 算法加密
 - API Key 等敏感信息单独保护
 - 可选密码保护功能
@@ -212,6 +267,7 @@ npm run preview
 <td>
 
 ### 📦 数据自主
+
 - 所有数据存储在本地
 - 支持加密备份导出
 - 智能合并导入数据
@@ -223,6 +279,7 @@ npm run preview
 ## 📝 使用指南
 
 ### 首次使用流程
+
 1. **打开应用** → 访问在线演示或本地安装版本
 2. **了解功能** → 查看设置页面了解各项功能
 3. **选择模式** → 根据需求选择编辑模式
@@ -230,23 +287,70 @@ npm run preview
 
 ### 三种编辑模式对比
 
-| 功能特性 | 上传模式 | 代码模式 | AI模式 |
-|---------|---------|---------|--------|
-| **网络需求** | 不需要 | 不需要 | 需要 |
-| **技术要求** | 低 | 中 | 低 |
-| **灵活性** | 中 | 高 | 中 |
+| 功能特性     | 上传模式     | 代码模式 | AI模式      |
+| ------------ | ------------ | -------- | ----------- |
+| **网络需求** | 不需要       | 不需要   | 需要        |
+| **技术要求** | 低           | 中       | 低          |
+| **灵活性**   | 中           | 高       | 中          |
 | **内容来源** | 现有HTML文件 | 手工编写 | AI生成+编辑 |
-| **完全离线** | ✓ | ✓ | ✗ |
+| **完全离线** | ✓            | ✓        | ✗           |
+
+### AI 智能搜索使用指南
+
+#### 搜索模式选择
+
+- **快速模式**：适合日常查找，响应快，API 调用次数少
+- **深度模式**：适合复杂查询，分析更深入，结果更全面
+
+#### 自然语言查询示例
+
+```
+查找意图：
+- "找我去年的旅行日记"
+- "我最近一周写的关于工作的日记"
+- "上个月心情不好的日记"
+
+统计意图：
+- "我今年写了多少篇日记"
+- "统计一下我的旅行日记数量"
+
+总结意图：
+- "总结一下我的2024年"
+- "总结一下我去云南旅行的经历"
+
+时间线意图：
+- "我去年都做了什么"
+- "展示我今年上半年的重要事件"
+
+问答意图：
+- "今天发生了什么"
+- "我上周有什么开心的事"
+
+对比意图：
+- "对比一下开心和难过时的日记"
+- "比较一下工作日和周末的日记"
+```
+
+#### 支持的时间表达式
+
+- 绝对时间：今天、昨天、前天、明天
+- 周：本周、上周、下周
+- 月：本月、上个月、下个月、具体月份（如1月）
+- 年：今年、去年、前年、具体年份（如2024年）
+- 相对时间：最近N天、最近一周、最近一个月、最近三个月
+- 特殊时间：周末、工作日
 
 ### 数据管理指南
 
 #### 📤 加密导出
+
 1. 进入"设置" → "数据管理"
 2. 点击"导出"
 3. 设置导出密码（至少6位）
 4. 下载加密备份文件
 
 #### 📥 密码导入
+
 1. 选择加密备份文件
 2. 输入解密密码
 3. 系统智能合并重复内容
@@ -266,6 +370,7 @@ npm run preview
 <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0;">
 
 #### 1.1 关于 AI 生成内容
+
 > **本软件部分代码由 AI 辅助生成，作者不对代码的完整性、准确性或适用性承担任何责任。**
 
 - AI 生成的内容可能不准确、不适当或存在偏见
@@ -273,6 +378,7 @@ npm run preview
 - AI 功能为可选附加功能，非核心功能
 
 #### 1.2 关于数据安全
+
 > **虽然实现了本地数据加密，但不能保证绝对安全。**
 
 - 任何加密系统都可能存在漏洞
@@ -280,6 +386,7 @@ npm run preview
 - 用户需自行负责数据备份
 
 #### 1.3 关于网络连接
+
 > **重要：只有不使用 AI 功能的前提下才是完全离线应用。**
 
 - AI 功能需要网络连接和有效的 API 密钥
@@ -291,6 +398,7 @@ npm run preview
 ### 2. 📊 详细风险说明
 
 #### 2.1 数据风险
+
 <table style="width:100%; background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
   <thead>
     <tr style="background: #4a5568; color: white;">
@@ -323,6 +431,7 @@ npm run preview
 </table>
 
 #### 2.2 技术限制
+
 ```yaml
 浏览器兼容性:
   - 现代浏览器: Chrome 80+, Firefox 75+, Safari 14+
@@ -346,16 +455,19 @@ PWA功能:
 <div style="background: #e6fffa; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #38b2ac;">
 
 #### 3.1 数据存储
+
 - **所有日记数据**使用 IndexedDB 存储在本地浏览器
 - **API Key 等敏感信息**仅本地存储，绝不上传到任何服务器
 - 支持加密导出/导入，使用 AES-GCM 算法保护数据
 
 #### 3.2 加密机制
+
 - 使用 **AES-GCM** 对称加密算法
 - 即使不设置密码，也使用应用内置密钥进行基础加密
 - 可选设置**本地加密密码**，使用用户密码+应用密钥双重加密
 
 #### 3.3 内容渲染安全
+
 - 用户 HTML 内容在严格隔离的 **iframe 沙盒**中渲染
 - 使用 `sandbox="allow-scripts allow-same-origin"` 属性
 - 通过 Blob URL 加载内容，确保与主应用非同源
@@ -367,12 +479,14 @@ PWA功能:
 <div style="background: #fffaf0; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #ed8936;">
 
 #### 4.1 AI 服务集成
+
 - 所有 AI API 调用**直接从用户浏览器发起**
 - 绝不经手任何第三方服务器
 - 支持自定义 Base URL，兼容 OpenAI API 格式的第三方服务
 - 用户需自行承担 AI 服务的使用费用
 
 #### 4.2 生成内容风险
+
 1. **准确性风险**：
    - AI 可能生成不准确、过时或错误的信息
    - 历史、科学、医疗等专业内容需特别验证
@@ -386,6 +500,7 @@ PWA功能:
    - 使用生成内容需自行确认版权归属
 
 #### 4.3 第三方服务责任
+
 - 本项目支持与第三方 AI 服务（如 OpenAI）集成
 - 作者不对这些第三方服务的行为、隐私政策或服务可用性承担任何责任
 - 用户需遵守 AI 服务提供商的使用条款
@@ -397,6 +512,7 @@ PWA功能:
 <div style="background: #fed7d7; padding: 20px; border-radius: 8px; margin: 20px 0;">
 
 #### 5.1 责任免除
+
 1. **在适用法律允许的最大范围内**，作者不对因使用或无法使用本软件而导致的任何直接、间接、附带、特殊或后果性损害承担责任。
 
 2. **损害包括但不限于**：
@@ -405,11 +521,13 @@ PWA功能:
    - 任何其他商业损害或损失
 
 #### 5.2 用户责任
+
 1. **遵守法律**：用户需遵守所在国家/地区的法律法规
 2. **内容责任**：用户需对生成内容和使用行为承担全部责任
 3. **年龄限制**：18 岁以下用户需在监护人指导下使用
 
 #### 5.3 权利保留
+
 - 保留修改功能的权力
 - 可能停止维护或更新
 - 不提供技术支持承诺
@@ -492,6 +610,8 @@ PWA功能:
   <img src="https://skillicons.dev/icons?i=vue,vite,tailwind,js,html,css" />
 </div>
 
+### 核心技术
+
 - **框架**: Vue 3 (Composition API)
 - **构建工具**: Vite
 - **样式**: Tailwind CSS
@@ -500,6 +620,16 @@ PWA功能:
 - **数据存储**: localForage (IndexedDB 封装)
 - **加密**: Web Crypto API (PBKDF2 + AES-GCM)
 - **PWA**: Vite PWA Plugin + 自定义 Service Worker
+
+### AI 智能搜索技术
+
+- **意图识别**: 基于 LLM 的多意图分类（搜索/统计/总结/时间线/问答/对比）
+- **时间解析**: 自然语言时间表达式解析引擎
+- **分层搜索**: 标签→标题→全文的三层本地搜索策略
+- **相关度评分**: AI 智能评分 + 多维度匹配（标签、时间、内容）
+- **自我验证**: 模型自主评估搜索结果完整性
+- **迭代优化**: 动态补充搜索策略
+- **提示词工程**: 7步搜索流程的精细化提示词设计
 
 ## 📄 许可证
 
@@ -528,6 +658,29 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ```
+
+## 📜 更新日志
+
+### v3.1.0 (2025-02-06)
+
+- ✨ **新增 AI 智能搜索功能**
+  - 支持自然语言查询日记
+  - 快速/深度两种搜索模式
+  - 6种搜索意图识别（查找/统计/总结/时间线/问答/对比）
+  - 智能时间表达式解析
+  - AI 对话控制台，透明化搜索过程
+  - 可自定义提示词设置
+- 🔧 优化搜索算法，支持分层本地搜索
+- 📊 新增搜索结果统计报告
+
+### v3.0.0 (2024)
+
+- 🎉 墨记 3.0 正式发布
+- 🌐 在线演示版本
+- 📁 本地优先数据存储
+- 🎯 多模式编辑（上传/代码/AI辅助）
+- 🔐 AES-GCM 本地加密
+- 📱 PWA 支持
 
 ## 🙏 致谢
 
@@ -575,7 +728,7 @@ SOFTWARE.
   <hr style="border: none; height: 1px; background: linear-gradient(to right, transparent, #e2e8f0, transparent); margin: 20px auto; width: 80%;">
   
   <div style="font-size: 0.8em; color: #a0aec0;">
-    <p>📱 支持 PWA 安装到桌面 · 🔐 本地加密存储 · 🌐 在线演示随时体验</p>
+    <p>📱 支持 PWA 安装到桌面 · 🔐 本地加密存储 · 🔍 AI 智能搜索 · 🌐 在线演示随时体验</p>
     <p>⚠️ 重要：在线演示数据仅存储在您当前浏览器中，建议重要数据定期备份</p>
   </div>
 </div>
