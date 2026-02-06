@@ -35,7 +35,7 @@
       <div class="header-center">
         <h1 class="diary-title">{{ diary?.title || '加载中...' }}</h1>
         <div v-if="diary" class="diary-meta">
-          <span class="meta-item">
+          <span class="meta-item date-full" :title="formatFullDate(diary)">
             {{ formatChineseDate(diary.createTime) }}
           </span>
           <span v-if="diary.moodIcon" class="meta-item mood">
@@ -114,7 +114,7 @@
 <script setup>
 import { ref, computed, onMounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { getDiary, deleteDiary, getAllDiaries, formatChineseDate } from '../modules/db.js'
+import { getDiary, deleteDiary, getAllDiaries, formatChineseDate, formatFullDate } from '../modules/db.js'
 import SandboxRenderer from '../components/SandboxRenderer.vue'
 import InkButton from '../components/InkButton.vue'
 

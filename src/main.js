@@ -19,6 +19,7 @@ import DiaryReader from './views/DiaryReader.vue'
 import DiaryEditor from './views/DiaryEditor.vue'
 import PromptSettings from './views/PromptSettings.vue'
 import Settings from './views/Settings.vue'
+import AIConsole from './views/AIConsole.vue'
 
 // ========================================
 // 路由配置
@@ -76,7 +77,16 @@ const routes = [
     component: Settings,
     meta: {
       title: '设置',
-      icon: '??'
+      icon: '⚙️'
+    }
+  },
+  {
+    path: '/console',
+    name: 'AIConsole',
+    component: AIConsole,
+    meta: {
+      title: '控制台',
+      icon: '🖥️'
     }
   },
   // 404 重定向

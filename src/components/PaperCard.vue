@@ -36,7 +36,8 @@
           
           <!-- 元信息：日期和心情 -->
           <div class="card-meta">
-            <span v-if="date" class="card-date">{{ date }}</span>
+            <span v-if="date" class="card-date" :title="dateDetail || date">{{ date }}</span>
+            <span v-if="dateDetail" class="card-date-detail">{{ dateDetail }}</span>
             <span v-if="moodIcon" class="card-mood">
               <span class="mood-icon">{{ moodIcon }}</span>
               <span v-if="mood" class="mood-text">{{ mood }}</span>
@@ -90,6 +91,11 @@ const props = defineProps({
   },
   // 日期显示
   date: {
+    type: String,
+    default: ''
+  },
+  // 详细日期（包含创建和更新时间）
+  dateDetail: {
     type: String,
     default: ''
   },
@@ -417,6 +423,15 @@ function handleClick(event) {
   font-family: "LXGW WenKai", serif;
   font-size: 0.875rem;
   color: var(--ink-sandalwood);
+}
+
+.card-date-detail {
+  font-family: "LXGW WenKai", serif;
+  font-size: 0.75rem;
+  color: var(--ink-sandalwood);
+  opacity: 0.8;
+  display: block;
+  margin-top: 0.25rem;
 }
 
 .card-mood {

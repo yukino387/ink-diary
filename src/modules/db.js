@@ -43,6 +43,13 @@ const promptStore = localforage.createInstance({
   description: '墨记提示词配置存储'
 })
 
+// AI对话历史存储
+const aiConversationStore = localforage.createInstance({
+  name: 'InkDiary',
+  storeName: 'aiConversations',
+  description: '墨记AI对话历史存储'
+})
+
 // ========================================
 // 日记数据操作
 // ========================================
@@ -65,31 +72,58 @@ function getCurrentTime() {
 }
 
 /**
- * 将日期格式化为中国传统农历风格（简化版）
- * 实际格式：YYYY年MM月DD日
+ * 将日期格式化为公历格式（带时分）
+ * 格式：YYYY年MM月DD日 HH:mm
  */
 export function formatChineseDate(dateString) {
   const date = new Date(dateString)
   const year = date.getFullYear()
-  const month = date.getMonth() + 1
-  const day = date.getDate()
+  const month = String(date.getMonth() + 1).padStart(2, '0')
+  const day = String(date.getDate()).padStart(2, '0')
+  const hour = String(date.getHours()).padStart(2, '0')
+  const minute = String(date.getMinutes()).padStart(2, '0')
   
-  // 天干地支年份映射（简化）
-  const heavenlyStems = ['甲', '乙', '丙', '丁', '戊', '己', '庚', '辛', '壬', '癸']
-  const earthlyBranches = ['子', '丑', '寅', '卯', '辰', '巳', '午', '未', '申', '酉', '戌', '亥']
-  const zodiacYear = (year - 4) % 60
-  const stem = heavenlyStems[zodiacYear % 10]
-  const branch = earthlyBranches[zodiacYear % 12]
+  return `${year}年${month}月${day}日 ${hour}:${minute}`
+}
+
+/**
+ * 格式化日期为简短格式（用于列表显示）
+ * 格式：YYYY年MM月DD日
+ */
+export function formatShortDate(dateString) {
+  const date = new Date(dateString)
+  const year = date.getFullYear()
+  const month = String(date.getMonth() + 1).padStart(2, '0')
+  const day = String(date.getDate()).padStart(2, '0')
   
-  // 农历月份名称
-  const lunarMonths = ['正月', '二月', '三月', '四月', '五月', '六月', 
-                       '七月', '八月', '九月', '十月', '冬月', '腊月']
-  const lunarDays = ['初一', '初二', '初三', '初四', '初五', '初六', '初七', '初八', '初九', '初十',
-                     '十一', '十二', '十三', '十四', '十五', '十六', '十七', '十八', '十九', '二十',
-                     '廿一', '廿二', '廿三', '廿四', '廿五', '廿六', '廿七', '廿八', '廿九', '三十']
+  return `${year}年${month}月${day}日`
+}
+
+/**
+ * 格式化日期为完整格式（包含创建和更新时间）
+ * @param {Object} diary - 日记对象
+ * @returns {string} 格式化后的日期字符串
+ */
+export function formatFullDate(diary) {
+  const createDate = new Date(diary.createTime)
+  const updateDate = diary.updateTime ? new Date(diary.updateTime) : null
   
-  // 返回简化格式（实际农历计算复杂，这里用公历模拟）
-  return `${stem}${branch}年${lunarMonths[month - 1]}${lunarDays[day - 1]}`
+  const formatDateTime = (date) => {
+    const year = date.getFullYear()
+    const month = String(date.getMonth() + 1).padStart(2, '0')
+    const day = String(date.getDate()).padStart(2, '0')
+    const hour = String(date.getHours()).padStart(2, '0')
+    const minute = String(date.getMinutes()).padStart(2, '0')
+    return `${year}年${month}月${day}日 ${hour}:${minute}`
+  }
+  
+  let result = `创建：${formatDateTime(createDate)}`
+  
+  if (updateDate && updateDate.getTime() !== createDate.getTime()) {
+    result += ` · 更新：${formatDateTime(updateDate)}`
+  }
+  
+  return result
 }
 
 /**
@@ -302,6 +336,154 @@ export async function getAllDiaries(options = {}) {
 }
 
 /**
+ * 解析时间关键词为日期范围
+ * 支持：今天、昨天、前天、本周、上周、下周、本月、上个月、下个月、今年、去年等
+ * @param {string} keyword - 搜索关键词
+ * @returns {Object|null} - { start: 'YYYY-MM-DD', end: 'YYYY-MM-DD', description: string } 或 null
+ */
+function parseTimeKeyword(keyword) {
+  if (!keyword) return null
+  
+  const expr = keyword.toLowerCase().trim()
+  const now = new Date()
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate())
+  
+  const formatDate = (date) => {
+    return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`
+  }
+  
+  // 今天
+  if (expr === '今天' || expr === '今日') {
+    const date = formatDate(today)
+    return { start: date, end: date, description: '今天' }
+  }
+  
+  // 昨天
+  if (expr === '昨天' || expr === '昨日') {
+    const yesterday = new Date(today)
+    yesterday.setDate(yesterday.getDate() - 1)
+    const date = formatDate(yesterday)
+    return { start: date, end: date, description: '昨天' }
+  }
+  
+  // 前天
+  if (expr === '前天') {
+    const dayBefore = new Date(today)
+    dayBefore.setDate(dayBefore.getDate() - 2)
+    const date = formatDate(dayBefore)
+    return { start: date, end: date, description: '前天' }
+  }
+  
+  // 明天
+  if (expr === '明天' || expr === '明日') {
+    const tomorrow = new Date(today)
+    tomorrow.setDate(tomorrow.getDate() + 1)
+    const date = formatDate(tomorrow)
+    return { start: date, end: date, description: '明天' }
+  }
+  
+  // 本周
+  if (expr === '本周' || expr === '这周' || expr === '这个星期' || expr === '本星期') {
+    const weekStart = new Date(today)
+    weekStart.setDate(weekStart.getDate() - weekStart.getDay())
+    const weekEnd = new Date(weekStart)
+    weekEnd.setDate(weekEnd.getDate() + 6)
+    return { start: formatDate(weekStart), end: formatDate(weekEnd), description: '本周' }
+  }
+  
+  // 上周
+  if (expr === '上周' || expr === '上星期' || expr === '上个星期') {
+    const lastWeekStart = new Date(today)
+    lastWeekStart.setDate(lastWeekStart.getDate() - lastWeekStart.getDay() - 7)
+    const lastWeekEnd = new Date(lastWeekStart)
+    lastWeekEnd.setDate(lastWeekEnd.getDate() + 6)
+    return { start: formatDate(lastWeekStart), end: formatDate(lastWeekEnd), description: '上周' }
+  }
+  
+  // 下周
+  if (expr === '下周' || expr === '下星期' || expr === '下个星期') {
+    const nextWeekStart = new Date(today)
+    nextWeekStart.setDate(nextWeekStart.getDate() - nextWeekStart.getDay() + 7)
+    const nextWeekEnd = new Date(nextWeekStart)
+    nextWeekEnd.setDate(nextWeekEnd.getDate() + 6)
+    return { start: formatDate(nextWeekStart), end: formatDate(nextWeekEnd), description: '下周' }
+  }
+  
+  // 本月
+  if (expr === '本月' || expr === '这个月') {
+    const monthStart = new Date(today.getFullYear(), today.getMonth(), 1)
+    const monthEnd = new Date(today.getFullYear(), today.getMonth() + 1, 0)
+    return { start: formatDate(monthStart), end: formatDate(monthEnd), description: '本月' }
+  }
+  
+  // 上个月
+  if (expr === '上个月' || expr === '上月') {
+    const lastMonthStart = new Date(today.getFullYear(), today.getMonth() - 1, 1)
+    const lastMonthEnd = new Date(today.getFullYear(), today.getMonth(), 0)
+    return { start: formatDate(lastMonthStart), end: formatDate(lastMonthEnd), description: '上个月' }
+  }
+  
+  // 下个月
+  if (expr === '下个月' || expr === '下月') {
+    const nextMonthStart = new Date(today.getFullYear(), today.getMonth() + 1, 1)
+    const nextMonthEnd = new Date(today.getFullYear(), today.getMonth() + 2, 0)
+    return { start: formatDate(nextMonthStart), end: formatDate(nextMonthEnd), description: '下个月' }
+  }
+  
+  // 今年
+  if (expr === '今年' || expr === '这一年') {
+    const yearStart = new Date(today.getFullYear(), 0, 1)
+    const yearEnd = new Date(today.getFullYear(), 11, 31)
+    return { start: formatDate(yearStart), end: formatDate(yearEnd), description: '今年' }
+  }
+  
+  // 去年
+  if (expr === '去年' || expr === '上一年') {
+    const lastYearStart = new Date(today.getFullYear() - 1, 0, 1)
+    const lastYearEnd = new Date(today.getFullYear() - 1, 11, 31)
+    return { start: formatDate(lastYearStart), end: formatDate(lastYearEnd), description: '去年' }
+  }
+  
+  // 前年
+  if (expr === '前年') {
+    const yearBeforeLastStart = new Date(today.getFullYear() - 2, 0, 1)
+    const yearBeforeLastEnd = new Date(today.getFullYear() - 2, 11, 31)
+    return { start: formatDate(yearBeforeLastStart), end: formatDate(yearBeforeLastEnd), description: '前年' }
+  }
+  
+  // 最近N天
+  const recentDaysMatch = expr.match(/^最近(\d+)天$/)
+  if (recentDaysMatch) {
+    const days = parseInt(recentDaysMatch[1])
+    const start = new Date(today)
+    start.setDate(start.getDate() - days + 1)
+    return { start: formatDate(start), end: formatDate(today), description: `最近${days}天` }
+  }
+  
+  // 具体月份（如：1月、2月）
+  const monthMatch = expr.match(/^(\d{1,2})月$/)
+  if (monthMatch) {
+    const month = parseInt(monthMatch[1]) - 1
+    if (month >= 0 && month <= 11) {
+      const monthStart = new Date(today.getFullYear(), month, 1)
+      const monthEnd = new Date(today.getFullYear(), month + 1, 0)
+      return { start: formatDate(monthStart), end: formatDate(monthEnd), description: `${month + 1}月` }
+    }
+  }
+  
+  // 具体年份（如：2024年）
+  const yearMatch = expr.match(/^(\d{4})年$/)
+  if (yearMatch) {
+    const year = parseInt(yearMatch[1])
+    const yearStart = new Date(year, 0, 1)
+    const yearEnd = new Date(year, 11, 31)
+    return { start: formatDate(yearStart), end: formatDate(yearEnd), description: `${year}年` }
+  }
+  
+  return null
+}
+
+/**
  * 搜索日记（综合搜索）
  * @param {string} keyword - 搜索关键词
  * @returns {Promise<Array>} 匹配的日记数组
@@ -315,6 +497,19 @@ export async function searchDiaries(keyword) {
     const searchTerm = keyword.toLowerCase().trim()
     const diaries = await getAllDiaries()
     
+    // 首先尝试解析时间关键词
+    const timeRange = parseTimeKeyword(searchTerm)
+    if (timeRange) {
+      // 如果是时间关键词，按日期范围筛选
+      return diaries.filter(diary => {
+        // 使用本地时区格式化日期，避免UTC时差问题
+        const diaryDate = new Date(diary.createTime)
+        const localDate = `${diaryDate.getFullYear()}-${String(diaryDate.getMonth() + 1).padStart(2, '0')}-${String(diaryDate.getDate()).padStart(2, '0')}`
+        return localDate >= timeRange.start && localDate <= timeRange.end
+      })
+    }
+    
+    // 普通文本搜索
     return diaries.filter(diary => {
       const titleMatch = diary.title.toLowerCase().includes(searchTerm)
       const contentMatch = diary.htmlContent.toLowerCase().includes(searchTerm)
@@ -550,18 +745,111 @@ export async function exportAllData() {
  * @param {boolean} options.merge - 是否合并（true: 合并，false: 覆盖）
  * @returns {Promise<Object>} 导入结果统计
  */
+/**
+ * 检测数据版本并迁移
+ * @param {Object} data - 导入的数据
+ * @returns {Object} 迁移后的数据
+ */
+function detectAndMigrateDataVersion(data) {
+  // 检测版本
+  const version = data.version || '1.0.0'
+  
+  // 如果版本相同或较新，直接返回
+  if (version >= '2.0.0') {
+    return data
+  }
+  
+  console.log('[DB] 检测到旧版本数据:', version, '，开始迁移...')
+  
+  const migratedData = {
+    version: '2.0.0',
+    exportTime: data.exportTime || new Date().toISOString(),
+    diaries: [],
+    config: {},
+    prompts: {}
+  }
+  
+  // 迁移日记数据
+  if (data.diaries && Array.isArray(data.diaries)) {
+    migratedData.diaries = data.diaries.map(diary => ({
+      ...diary,
+      // 确保新字段存在
+      tags: diary.tags || [],
+      mood: diary.mood || '',
+      moodIcon: diary.moodIcon || '',
+      summary: diary.summary || '',
+      style: diary.style || 'classical',
+      preset: diary.preset || '',
+      originalContent: diary.originalContent || '',
+      // 确保时间字段存在
+      createTime: diary.createTime || new Date().toISOString(),
+      updateTime: diary.updateTime || diary.createTime || new Date().toISOString()
+    }))
+  }
+  
+  // 迁移配置数据
+  if (data.config && typeof data.config === 'object') {
+    migratedData.config = { ...data.config }
+  }
+  
+  // 迁移提示词配置（兼容旧版本的 prompts 结构）
+  if (data.prompts && typeof data.prompts === 'object') {
+    migratedData.prompts = { ...data.prompts }
+    
+    // 如果旧版本只有部分提示词，补充默认值
+    const defaultPrompts = {
+      systemPrompt: '',
+      userPromptTemplate: '',
+      tagsPrompt: '',
+      summaryPrompt: '',
+      keywordGenerationPrompt: '',
+      quickSearchPrompt: '',
+      keywordExtensionPrompt: '',
+      contentAnalysisDecisionPrompt: '',
+      deepSearchPrompt: '',
+      reportGenerationPrompt: ''
+    }
+    
+    // 合并默认值和现有值
+    migratedData.prompts = { ...defaultPrompts, ...migratedData.prompts }
+  }
+  
+  console.log('[DB] 数据迁移完成')
+  return migratedData
+}
+
 export async function importAllData(data, options = { merge: true }) {
   try {
-    if (!data.diaries || !Array.isArray(data.diaries)) {
-      throw new Error('无效的数据格式')
+    // 检测数据格式
+    if (!data) {
+      throw new Error('无效的数据：数据为空')
     }
+    
+    // 支持旧版本数据格式（直接是日记数组）
+    if (Array.isArray(data)) {
+      data = {
+        version: '1.0.0',
+        diaries: data,
+        config: {},
+        prompts: {}
+      }
+    }
+    
+    // 检查必要字段
+    if (!data.diaries || !Array.isArray(data.diaries)) {
+      throw new Error('无效的数据格式：缺少日记数据')
+    }
+    
+    // 版本检测和迁移
+    const migratedData = detectAndMigrateDataVersion(data)
     
     const stats = {
       added: 0,
       updated: 0,
       skipped: 0,
       importedConfig: 0,
-      importedPrompts: 0
+      importedPrompts: 0,
+      migratedFromVersion: data.version || '1.0.0'
     }
     
     // 获取现有日记用于合并判断
@@ -569,7 +857,7 @@ export async function importAllData(data, options = { merge: true }) {
     const existingMap = new Map(existingDiaries.map(d => [d.id, d]))
     
     // 导入日记（智能合并）
-    for (const diary of data.diaries) {
+    for (const diary of migratedData.diaries) {
       if (!diary.id || diary.title === undefined) {
         stats.skipped++
         continue
@@ -600,16 +888,16 @@ export async function importAllData(data, options = { merge: true }) {
     }
     
     // 导入配置（合并模式：导入的配置覆盖现有）
-    if (data.config) {
-      for (const [key, value] of Object.entries(data.config)) {
+    if (migratedData.config && Object.keys(migratedData.config).length > 0) {
+      for (const [key, value] of Object.entries(migratedData.config)) {
         await configStore.setItem(key, value)
         stats.importedConfig++
       }
     }
     
     // 导入提示词配置
-    if (data.prompts) {
-      for (const [key, value] of Object.entries(data.prompts)) {
+    if (migratedData.prompts && Object.keys(migratedData.prompts).length > 0) {
+      for (const [key, value] of Object.entries(migratedData.prompts)) {
         await promptStore.setItem(key, value)
         stats.importedPrompts++
       }
@@ -788,6 +1076,200 @@ export async function getAllPrompts() {
 }
 
 // ========================================
+// AI对话历史操作
+// ========================================
+
+/**
+ * 保存AI对话记录
+ * @param {Object} conversation - 对话记录对象
+ * @param {string} conversation.query - 用户查询
+ * @param {string} conversation.mode - 搜索模式 ('quick' | 'deep')
+ * @param {Array} conversation.messages - 完整对话消息数组
+ * @param {Object} conversation.result - 搜索结果
+ * @param {number} conversation.totalRounds - 总轮数
+ * @returns {Promise<Object>} 保存的对话记录（含id）
+ */
+export async function saveAIConversation(conversation) {
+  try {
+    const id = generateId()
+    const now = getCurrentTime()
+    
+    // 深拷贝并清理消息数据，确保可以被 IndexedDB 序列化
+    const cleanMessages = Array.isArray(conversation.messages) 
+      ? conversation.messages.map(msg => ({
+          role: String(msg.role || ''),
+          content: String(msg.content || '')
+        }))
+      : []
+    
+    // 清理结果数据
+    const cleanResult = conversation.result ? {
+      results: Array.isArray(conversation.result.results) 
+        ? conversation.result.results.map(d => ({
+            id: String(d.id || ''),
+            title: String(d.title || ''),
+            createTime: String(d.createTime || ''),
+            summary: String(d.summary || ''),
+            mood: String(d.mood || ''),
+            moodIcon: String(d.moodIcon || ''),
+            tags: Array.isArray(d.tags) ? [...d.tags] : []
+          }))
+        : [],
+      answer: String(conversation.result.answer || ''),
+      reasoning: String(conversation.result.reasoning || ''),
+      suggestions: Array.isArray(conversation.result.suggestions) 
+        ? [...conversation.result.suggestions] 
+        : [],
+      totalRounds: Number(conversation.result.totalRounds || 0)
+    } : {}
+    
+    const record = {
+      id,
+      query: String(conversation.query || ''),
+      mode: String(conversation.mode || 'quick'),
+      messages: cleanMessages,
+      result: cleanResult,
+      totalRounds: Number(conversation.totalRounds || 0),
+      createTime: now
+    }
+    
+    await aiConversationStore.setItem(id, record)
+    console.log('[DB] AI对话记录已保存:', id)
+    return record
+  } catch (error) {
+    console.error('[DB] 保存AI对话记录失败:', error)
+    throw new Error('保存AI对话记录失败: ' + error.message)
+  }
+}
+
+/**
+ * 获取AI对话记录列表
+ * @param {Object} options - 查询选项
+ * @param {string} [options.mode] - 按模式筛选 ('quick' | 'deep')
+ * @param {string} [options.startDate] - 开始日期 (YYYY-MM-DD)
+ * @param {string} [options.endDate] - 结束日期 (YYYY-MM-DD)
+ * @param {number} [options.limit] - 限制数量
+ * @param {number} [options.offset] - 偏移量
+ * @returns {Promise<Array>} 对话记录数组
+ */
+export async function getAIConversations(options = {}) {
+  try {
+    const { mode, startDate, endDate, limit, offset = 0 } = options
+    
+    const conversations = []
+    await aiConversationStore.iterate((value) => {
+      conversations.push(value)
+    })
+    
+    // 按时间倒序排序
+    conversations.sort((a, b) => new Date(b.createTime) - new Date(a.createTime))
+    
+    // 应用筛选
+    let filtered = conversations
+    
+    if (mode) {
+      filtered = filtered.filter(c => c.mode === mode)
+    }
+    
+    if (startDate || endDate) {
+      filtered = filtered.filter(c => {
+        const date = new Date(c.createTime)
+        const dateStr = date.toISOString().split('T')[0]
+        if (startDate && dateStr < startDate) return false
+        if (endDate && dateStr > endDate) return false
+        return true
+      })
+    }
+    
+    // 应用分页
+    const total = filtered.length
+    if (limit !== undefined) {
+      filtered = filtered.slice(offset, offset + limit)
+    }
+    
+    return {
+      list: filtered,
+      total,
+      offset,
+      limit: limit || total
+    }
+  } catch (error) {
+    console.error('[DB] 获取AI对话记录失败:', error)
+    throw new Error('获取AI对话记录失败: ' + error.message)
+  }
+}
+
+/**
+ * 获取单条AI对话记录
+ * @param {string} id - 记录ID
+ * @returns {Promise<Object|null>} 对话记录或null
+ */
+export async function getAIConversation(id) {
+  try {
+    const record = await aiConversationStore.getItem(id)
+    return record
+  } catch (error) {
+    console.error('[DB] 获取AI对话记录失败:', error)
+    throw new Error('获取AI对话记录失败: ' + error.message)
+  }
+}
+
+/**
+ * 删除AI对话记录
+ * @param {string} id - 记录ID
+ * @returns {Promise<boolean>}
+ */
+export async function deleteAIConversation(id) {
+  try {
+    await aiConversationStore.removeItem(id)
+    console.log('[DB] AI对话记录已删除:', id)
+    return true
+  } catch (error) {
+    console.error('[DB] 删除AI对话记录失败:', error)
+    throw new Error('删除AI对话记录失败: ' + error.message)
+  }
+}
+
+/**
+ * 清空所有AI对话记录
+ * @returns {Promise<boolean>}
+ */
+export async function clearAIConversations() {
+  try {
+    await aiConversationStore.clear()
+    console.log('[DB] 所有AI对话记录已清空')
+    return true
+  } catch (error) {
+    console.error('[DB] 清空AI对话记录失败:', error)
+    throw new Error('清空AI对话记录失败: ' + error.message)
+  }
+}
+
+/**
+ * 导出AI对话记录
+ * @returns {Promise<Object>} 包含所有对话记录的对象
+ */
+export async function exportAIConversations() {
+  try {
+    const conversations = []
+    await aiConversationStore.iterate((value) => {
+      conversations.push(value)
+    })
+    
+    return {
+      version: '1.0.0',
+      exportTime: getCurrentTime(),
+      conversations: conversations.sort((a, b) => 
+        new Date(b.createTime) - new Date(a.createTime)
+      )
+    }
+  } catch (error) {
+    console.error('[DB] 导出AI对话记录失败:', error)
+    throw new Error('导出AI对话记录失败: ' + error.message)
+  }
+}
+
+// ========================================
 // 数据库工具函数
 // ========================================
 
@@ -799,6 +1281,7 @@ export async function clearAllData() {
   try {
     await diaryStore.clear()
     await configStore.clear()
+    await aiConversationStore.clear()
     console.log('[DB] 所有数据已清空')
     return true
   } catch (error) {
@@ -875,6 +1358,19 @@ export default {
   getAllConfig,
   deleteConfig,
   
+  // 提示词操作
+  getPrompt,
+  setPrompt,
+  getAllPrompts,
+  
+  // AI对话历史操作
+  saveAIConversation,
+  getAIConversations,
+  getAIConversation,
+  deleteAIConversation,
+  clearAIConversations,
+  exportAIConversations,
+  
   // 导入导出
   exportAllData,
   importAllData,
@@ -884,5 +1380,7 @@ export default {
   getDatabaseStats,
   checkDatabaseHealth,
   formatChineseDate,
+  formatShortDate,
+  formatFullDate,
   formatDate
 }

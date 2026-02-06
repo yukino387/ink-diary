@@ -89,6 +89,7 @@ const navItems = [
   { path: '/', label: '日记阁', icon: '📚' },
   { path: '/create', label: '新建', icon: '✍️' },
   { path: '/prompts', label: '提示词', icon: '🤖' },
+  { path: '/console', label: '控制台', icon: '🖥️' },
   { path: '/settings', label: '设置', icon: '⚙️' }
 ]
 
@@ -133,17 +134,7 @@ watch(() => route.path, (newPath) => {
 // 组件挂载时初始化
 onMounted(() => {
   loadPreferences()
-  
-  // 注册 Service Worker 以支持 PWA
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/service-worker.js')
-      .then((registration) => {
-        console.log('[App] Service Worker 注册成功:', registration.scope)
-      })
-      .catch((error) => {
-        console.log('[App] Service Worker 注册失败:', error)
-      })
-  }
+  // Service Worker 已在 index.html 中注册，避免重复注册
 })
 </script>
 

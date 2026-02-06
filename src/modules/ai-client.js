@@ -3,7 +3,7 @@
  * 提供 AI 生成日记内容、流式输出、风格模板等功能
  */
 
-import { getConfig } from './db.js'
+import { getConfig, getAllTags } from './db.js'
 
 // ========================================
 // 默认提示词配置（可被用户自定义覆盖）
@@ -58,7 +58,7 @@ export const DEFAULT_USER_PROMPT_TEMPLATE = `请将以下日记转换为精美�
 ## 输出格式
 直接返回HTML代码，不要添加任何解释说明。`
 
-export const DEFAULT_TAGS_PROMPT = `请为以下日记生成标签。
+export const DEFAULT_TAGS_PROMPT = `请为以下日记生成初步标签（第一轮）。
 
 ## 日记信息
 - 标题：{{title}}
@@ -68,10 +68,45 @@ export const DEFAULT_TAGS_PROMPT = `请为以下日记生成标签。
 {{content}}
 
 ## 生成要求
-1. 生成3-5个标签
+1. 生成3-5个初步标签
 2. 每个标签2-4个汉字
 3. 不要带#号或其他符号
 4. 标签应概括日记的主题、情感或关键词
+5. 这是第一轮生成，后续会结合已有标签进行优化
+
+## 输出格式
+必须返回JSON格式：
+{"tags": ["标签1", "标签2", "标签3"]}`
+
+export const DEFAULT_TAGS_OPTIMIZE_PROMPT = `请优化日记标签（第二轮）。
+
+## 日记信息
+- 标题：{{title}}
+- 心情：{{moodLabel}}
+
+## 日记内容
+{{content}}
+
+## 第一轮生成的初步标签
+{{initialTags}}
+
+## 用户已有的所有标签
+{{existingTags}}
+
+## 优化要求
+1. 从初步标签中选择最贴切的，或进行优化调整
+2. 参考已有标签列表，避免创建过于相似的重复标签
+3. 如果初步标签与已有标签含义相近，优先使用已有标签（保持标签体系一致性）
+4. 如果初步标签能更好地表达日记内容，可以保留或微调
+5. 最终生成3-5个标签
+6. 每个标签2-4个汉字
+7. 不要带#号或其他符号
+
+## 优化策略
+- 优先考虑标签的准确性和一致性
+- 在"表达准确性"和"体系一致性"之间取得平衡
+- 如果已有标签能准确表达，优先复用
+- 如果初步标签更准确，可以使用新的标签
 
 ## 输出格式
 必须返回JSON格式：
@@ -102,52 +137,39 @@ export const DEFAULT_SUMMARY_PROMPT = `请为以下日记生成一句话摘要�
 
 export const STYLE_OPTIONS = [
   { 
+    value: 'daily', 
+    label: '日常随笔', 
+    description: '温暖舒适，适合生活记录',
+    cssTheme: 'daily',
+    icon: '📝'
+  },
+  { 
+    value: 'work', 
+    label: '工作记录', 
+    description: '专业简洁，层次分明',
+    cssTheme: 'work',
+    icon: '💼'
+  },
+  { 
+    value: 'study', 
+    label: '学习笔记', 
+    description: '清晰易读，重点突出',
+    cssTheme: 'study',
+    icon: '📚'
+  },
+  { 
+    value: 'travel', 
+    label: '旅行游记', 
+    description: '开阔舒展，图文友好',
+    cssTheme: 'travel',
+    icon: '✈️'
+  },
+  { 
     value: 'none', 
-    label: '无风格', 
-    description: '不预设风格，可在下方自定义',
-    cssTheme: 'none'
-  },
-  { 
-    value: 'classical', 
-    label: '古风诗意', 
-    description: '古典雅致，如诗如画',
-    cssTheme: 'classical'
-  },
-  { 
-    value: 'minimal', 
-    label: '简约清新', 
-    description: '简洁明快，留白之美',
-    cssTheme: 'minimal'
-  },
-  { 
-    value: 'literary', 
-    label: '文艺复古', 
-    description: '怀旧温馨，文艺气息',
-    cssTheme: 'literary'
-  },
-  { 
-    value: 'nature', 
-    label: '自然田园', 
-    description: '清新自然，田园风情',
-    cssTheme: 'nature'
-  },
-  { 
-    value: 'dreamy', 
-    label: '梦幻唯美', 
-    description: '唯美浪漫，如梦似幻',
-    cssTheme: 'dreamy'
-  },
-  { 
-    value: 'japanese', 
-    label: '日系手账', 
-    description: '日式简约，手账风格',
-    cssTheme: 'japanese'
-  },
-  { 
-    value: 'ink', 
-    label: '水墨意境', 
-    description: '水墨丹青，东方美学',
-    cssTheme: 'ink'
+    label: '自定义', 
+    description: '基础样式，自由发挥',
+    cssTheme: 'none',
+    icon: '⚙️'
   }
 ]
 
@@ -172,7 +194,7 @@ export const MOOD_OPTIONS = [
 // ========================================
 
 const CSS_THEMES = {
-  classical: `
+  daily: `
     :root {
       --bg-color: #faf8f3;
       --text-color: #2c3e50;
@@ -180,88 +202,71 @@ const CSS_THEMES = {
       --secondary-color: #a0826d;
       --border-color: #d4c4b0;
     }
-    body { background: linear-gradient(to bottom, #faf8f3, #f5f0e8); }
+    body { background: #faf8f3; }
     h1 { color: var(--accent-color); border-bottom: 2px solid var(--border-color); padding-bottom: 0.5em; }
-    .content { text-indent: 2em; line-height: 2; }
+    .content { text-indent: 2em; line-height: 1.8; }
+    .content p { margin-bottom: 1em; }
     .mood-badge { background: rgba(139, 69, 19, 0.1); border: 1px solid var(--border-color); }
   `,
-  minimal: `
+  work: `
+    :root {
+      --bg-color: #f8f9fa;
+      --text-color: #1a365d;
+      --accent-color: #3182ce;
+      --secondary-color: #4a5568;
+      --border-color: #e2e8f0;
+    }
+    body { background: #f8f9fa; }
+    h1 { color: var(--text-color); font-weight: 600; border-bottom: 2px solid var(--border-color); padding-bottom: 0.5em; }
+    .content { line-height: 1.7; }
+    .content p { margin-bottom: 0.75em; }
+    .content ul, .content ol { margin-left: 1.5em; margin-bottom: 0.75em; }
+    .mood-badge { background: rgba(49, 130, 206, 0.1); border: 1px solid var(--accent-color); }
+  `,
+  study: `
+    :root {
+      --bg-color: #fefce8;
+      --text-color: #1f2937;
+      --accent-color: #047857;
+      --secondary-color: #374151;
+      --border-color: #d1d5db;
+    }
+    body { background: #fefce8; }
+    h1 { color: var(--accent-color); border-bottom: 2px solid var(--border-color); padding-bottom: 0.5em; }
+    .content { line-height: 1.8; }
+    .content p { margin-bottom: 1em; }
+    .content blockquote { border-left: 3px solid var(--accent-color); padding-left: 1em; margin-left: 0; color: var(--secondary-color); }
+    .content strong { color: var(--accent-color); }
+    .mood-badge { background: rgba(4, 120, 87, 0.1); border: 1px solid var(--accent-color); }
+  `,
+  travel: `
+    :root {
+      --bg-color: #f0f9ff;
+      --text-color: #0c4a6e;
+      --accent-color: #0891b2;
+      --secondary-color: #334155;
+      --border-color: #bae6fd;
+    }
+    body { background: #f0f9ff; }
+    h1 { color: var(--accent-color); border-bottom: 2px solid var(--border-color); padding-bottom: 0.5em; }
+    .content { line-height: 1.75; }
+    .content p { margin-bottom: 0.75em; }
+    .timeline { border-left: 2px solid var(--accent-color); padding-left: 1em; }
+    .mood-badge { background: rgba(8, 145, 178, 0.1); border: 1px solid var(--accent-color); }
+  `,
+  none: `
     :root {
       --bg-color: #ffffff;
-      --text-color: #333333;
-      --accent-color: #2c3e50;
-      --secondary-color: #7f8c8d;
-      --border-color: #ecf0f1;
+      --text-color: #1f2937;
+      --accent-color: #6b7280;
+      --secondary-color: #4b5563;
+      --border-color: #e5e7eb;
     }
     body { background: #ffffff; }
-    h1 { color: var(--accent-color); font-weight: 300; letter-spacing: 0.1em; }
-    .content { line-height: 1.8; }
-    .mood-badge { background: #f8f9fa; }
-  `,
-  literary: `
-    :root {
-      --bg-color: #f7f3e9;
-      --text-color: #4a4a4a;
-      --accent-color: #9c6644;
-      --secondary-color: #b08968;
-      --border-color: #e6d5c3;
-    }
-    body { background: #f7f3e9; }
-    h1 { color: var(--accent-color); font-style: italic; }
-    .content { line-height: 1.9; color: #5a5a5a; }
-    .mood-badge { background: rgba(156, 102, 68, 0.1); }
-  `,
-  nature: `
-    :root {
-      --bg-color: #f1f8e9;
-      --text-color: #33691e;
-      --accent-color: #558b2f;
-      --secondary-color: #7cb342;
-      --border-color: #c5e1a5;
-    }
-    body { background: linear-gradient(135deg, #f1f8e9 0%, #e8f5e9 100%); }
-    h1 { color: var(--accent-color); }
-    .content { line-height: 1.85; }
-    .mood-badge { background: rgba(85, 139, 47, 0.1); }
-  `,
-  dreamy: `
-    :root {
-      --bg-color: #f3e5f5;
-      --text-color: #4a148c;
-      --accent-color: #7b1fa2;
-      --secondary-color: #9c27b0;
-      --border-color: #e1bee7;
-    }
-    body { background: linear-gradient(180deg, #f3e5f5 0%, #e8eaf6 50%, #e3f2fd 100%); }
-    h1 { color: var(--accent-color); text-shadow: 1px 1px 2px rgba(123, 31, 162, 0.1); }
-    .content { line-height: 1.9; }
-    .mood-badge { background: rgba(123, 31, 162, 0.1); }
-  `,
-  japanese: `
-    :root {
-      --bg-color: #fefefe;
-      --text-color: #3d3d3d;
-      --accent-color: #e74c3c;
-      --secondary-color: #95a5a6;
-      --border-color: #ecf0f1;
-    }
-    body { background: #fefefe; }
-    h1 { color: var(--accent-color); font-weight: 400; }
-    .content { line-height: 2; font-size: 0.95em; }
-    .mood-badge { background: #fff5f5; border: 1px solid #ffe0e0; }
-  `,
-  ink: `
-    :root {
-      --bg-color: #f5f5f5;
-      --text-color: #2c2c2c;
-      --accent-color: #1a1a1a;
-      --secondary-color: #666666;
-      --border-color: #cccccc;
-    }
-    body { background: radial-gradient(ellipse at top, #f5f5f5, #e8e8e8); }
-    h1 { color: var(--accent-color); font-weight: 500; letter-spacing: 0.15em; }
-    .content { line-height: 2; text-indent: 2em; }
-    .mood-badge { background: rgba(0, 0, 0, 0.05); border: 1px solid rgba(0, 0, 0, 0.1); }
+    h1 { color: var(--text-color); border-bottom: 1px solid var(--border-color); padding-bottom: 0.5em; }
+    .content { line-height: 1.7; }
+    .content p { margin-bottom: 1em; }
+    .mood-badge { background: #f3f4f6; border: 1px solid var(--border-color); }
   `
 }
 
@@ -592,7 +597,7 @@ export async function generateDiaryContentStream(params, onChunk, onComplete, on
 }
 
 /**
- * 生成标签和摘要
+ * 生成标签和摘要（标签使用两轮优化）
  * @param {Object} params - 日记参数
  * @returns {Promise<{tags: string[], summary: string}>}
  */
@@ -609,20 +614,22 @@ async function generateTagsAndSummary(params) {
   
   // 获取自定义提示词
   const tagsPromptTemplate = await getConfig('tagsPrompt', DEFAULT_TAGS_PROMPT)
+  const tagsOptimizePromptTemplate = await getConfig('tagsOptimizePrompt', DEFAULT_TAGS_OPTIMIZE_PROMPT)
   const summaryPromptTemplate = await getConfig('summaryPrompt', DEFAULT_SUMMARY_PROMPT)
   
-  // 构建变量对象
-  const variables = {
+  // 基础变量
+  const baseVariables = {
     title: title || '',
     moodLabel: moodLabel || '',
-    content: content ? content.substring(0, 500) + (content.length > 500 ? '...' : '') : ''
+    content: content ? content.substring(0, 800) + (content.length > 800 ? '...' : '') : ''
   }
   
-  // 分别生成标签和摘要
   try {
-    // 生成标签
-    const tagsPrompt = replaceTemplateVariables(tagsPromptTemplate, variables)
-    const tagsResponse = await fetch(`${apiBaseUrl}/chat/completions`, {
+    // ========== 第一轮：生成初步标签 ==========
+    console.log('[AI] 开始第一轮标签生成...')
+    const firstPrompt = replaceTemplateVariables(tagsPromptTemplate, baseVariables)
+    
+    const firstResponse = await fetch(`${apiBaseUrl}/chat/completions`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -631,29 +638,115 @@ async function generateTagsAndSummary(params) {
       body: JSON.stringify({
         model: aiModel,
         messages: [
-          { role: 'user', content: tagsPrompt }
+          { role: 'user', content: firstPrompt }
         ],
         temperature: 0.5,
-        max_tokens: 100
+        max_tokens: 150
       })
     })
     
-    let tags = []
-    if (tagsResponse.ok) {
-      const tagsData = await tagsResponse.json()
-      let tagsText = tagsData.choices?.[0]?.message?.content || ''
-      tagsText = tagsText.replace(/```json\n?/gi, '').replace(/```\n?/gi, '').trim()
-      try {
-        const tagsResult = JSON.parse(tagsText)
-        tags = tagsResult.tags || []
-      } catch (e) {
-        tags = generateLocalTags(params)
-      }
-    } else {
-      tags = generateLocalTags(params)
+    if (!firstResponse.ok) {
+      console.error('[AI] 第一轮标签生成失败，使用本地生成')
+      const summary = await generateSummaryOnly(params, summaryPromptTemplate, baseVariables, apiBaseUrl, apiKey, aiModel)
+      return { tags: generateLocalTags(params), summary }
     }
     
-    // 生成摘要
+    const firstData = await firstResponse.json()
+    let firstText = firstData.choices?.[0]?.message?.content || ''
+    firstText = firstText.replace(/```json\n?/gi, '').replace(/```\n?/gi, '').trim()
+    
+    let initialTags = []
+    try {
+      const firstResult = JSON.parse(firstText)
+      initialTags = firstResult.tags || []
+      console.log('[AI] 第一轮生成的初步标签:', initialTags)
+    } catch (e) {
+      console.error('[AI] 解析第一轮标签失败，使用本地生成')
+      const summary = await generateSummaryOnly(params, summaryPromptTemplate, baseVariables, apiBaseUrl, apiKey, aiModel)
+      return { tags: generateLocalTags(params), summary }
+    }
+    
+    if (initialTags.length === 0) {
+      const summary = await generateSummaryOnly(params, summaryPromptTemplate, baseVariables, apiBaseUrl, apiKey, aiModel)
+      return { tags: generateLocalTags(params), summary }
+    }
+    
+    // ========== 获取所有已有标签 ==========
+    let existingTags = []
+    try {
+      existingTags = await getAllTags()
+      console.log('[AI] 获取到已有标签:', existingTags)
+    } catch (e) {
+      console.warn('[AI] 获取已有标签失败，继续使用初步标签')
+    }
+    
+    // ========== 第二轮：优化标签 ==========
+    console.log('[AI] 开始第二轮标签优化...')
+    const optimizeVariables = {
+      ...baseVariables,
+      initialTags: JSON.stringify(initialTags, null, 2),
+      existingTags: existingTags.length > 0 
+        ? existingTags.join(', ')
+        : '暂无已有标签'
+    }
+    
+    const secondPrompt = replaceTemplateVariables(tagsOptimizePromptTemplate, optimizeVariables)
+    
+    const secondResponse = await fetch(`${apiBaseUrl}/chat/completions`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${apiKey}`
+      },
+      body: JSON.stringify({
+        model: aiModel,
+        messages: [
+          { role: 'user', content: secondPrompt }
+        ],
+        temperature: 0.3,
+        max_tokens: 150
+      })
+    })
+    
+    let tags = initialTags
+    if (secondResponse.ok) {
+      const secondData = await secondResponse.json()
+      let secondText = secondData.choices?.[0]?.message?.content || ''
+      secondText = secondText.replace(/```json\n?/gi, '').replace(/```\n?/gi, '').trim()
+      
+      try {
+        const secondResult = JSON.parse(secondText)
+        tags = secondResult.tags || initialTags
+        console.log('[AI] 第二轮优化后的最终标签:', tags)
+      } catch (e) {
+        console.warn('[AI] 解析第二轮标签失败，使用初步标签')
+      }
+    } else {
+      console.warn('[AI] 第二轮标签优化失败，返回初步标签')
+    }
+    
+    // ========== 生成摘要（并行执行）==========
+    const summary = await generateSummaryOnly(params, summaryPromptTemplate, baseVariables, apiBaseUrl, apiKey, aiModel)
+    
+    return { tags, summary }
+  } catch (error) {
+    console.error('[AI] 生成标签和摘要失败:', error)
+    return generateLocalTagsAndSummary(params)
+  }
+}
+
+/**
+ * 独立生成摘要（辅助函数）
+ * @param {Object} params - 日记参数
+ * @param {string} summaryPromptTemplate - 摘要提示词模板
+ * @param {Object} variables - 变量对象
+ * @param {string} apiBaseUrl - API基础URL
+ * @param {string} apiKey - API密钥
+ * @param {string} aiModel - AI模型
+ * @returns {Promise<string>}
+ */
+async function generateSummaryOnly(params, summaryPromptTemplate, variables, apiBaseUrl, apiKey, aiModel) {
+  try {
     const summaryPrompt = replaceTemplateVariables(summaryPromptTemplate, variables)
     const summaryResponse = await fetch(`${apiBaseUrl}/chat/completions`, {
       method: 'POST',
@@ -671,25 +764,22 @@ async function generateTagsAndSummary(params) {
       })
     })
     
-    let summary = ''
     if (summaryResponse.ok) {
       const summaryData = await summaryResponse.json()
       let summaryText = summaryData.choices?.[0]?.message?.content || ''
       summaryText = summaryText.replace(/```json\n?/gi, '').replace(/```\n?/gi, '').trim()
       try {
         const summaryResult = JSON.parse(summaryText)
-        summary = summaryResult.summary || ''
+        return summaryResult.summary || ''
       } catch (e) {
-        summary = generateLocalSummary(params)
+        return generateLocalSummary(params)
       }
     } else {
-      summary = generateLocalSummary(params)
+      return generateLocalSummary(params)
     }
-    
-    return { tags, summary }
   } catch (error) {
-    console.error('[AI] 生成标签和摘要失败:', error)
-    return generateLocalTagsAndSummary(params)
+    console.error('[AI] 生成摘要失败:', error)
+    return generateLocalSummary(params)
   }
 }
 
@@ -793,17 +883,23 @@ export async function generateTags(params) {
     return generateLocalTags(params)
   }
   
+  // 获取提示词模板
   const tagsPromptTemplate = await getConfig('tagsPrompt', DEFAULT_TAGS_PROMPT)
+  const tagsOptimizePromptTemplate = await getConfig('tagsOptimizePrompt', DEFAULT_TAGS_OPTIMIZE_PROMPT)
   
-  const variables = {
+  // 基础变量
+  const baseVariables = {
     title: title || '',
     moodLabel: moodLabel || '',
-    content: content ? content.substring(0, 500) + (content.length > 500 ? '...' : '') : ''
+    content: content ? content.substring(0, 800) + (content.length > 800 ? '...' : '') : ''
   }
   
   try {
-    const tagsPrompt = replaceTemplateVariables(tagsPromptTemplate, variables)
-    const tagsResponse = await fetch(`${apiBaseUrl}/chat/completions`, {
+    // ========== 第一轮：生成初步标签 ==========
+    console.log('[AI] 开始第一轮标签生成...')
+    const firstPrompt = replaceTemplateVariables(tagsPromptTemplate, baseVariables)
+    
+    const firstResponse = await fetch(`${apiBaseUrl}/chat/completions`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -812,26 +908,92 @@ export async function generateTags(params) {
       body: JSON.stringify({
         model: aiModel,
         messages: [
-          { role: 'user', content: tagsPrompt }
+          { role: 'user', content: firstPrompt }
         ],
         temperature: 0.5,
-        max_tokens: 100
+        max_tokens: 150
       })
     })
     
-    if (tagsResponse.ok) {
-      const tagsData = await tagsResponse.json()
-      let tagsText = tagsData.choices?.[0]?.message?.content || ''
-      tagsText = tagsText.replace(/```json\n?/gi, '').replace(/```\n?/gi, '').trim()
-      try {
-        const tagsResult = JSON.parse(tagsText)
-        return tagsResult.tags || []
-      } catch (e) {
-        return generateLocalTags(params)
-      }
-    } else {
+    if (!firstResponse.ok) {
+      console.error('[AI] 第一轮标签生成失败，使用本地生成')
       return generateLocalTags(params)
     }
+    
+    const firstData = await firstResponse.json()
+    let firstText = firstData.choices?.[0]?.message?.content || ''
+    firstText = firstText.replace(/```json\n?/gi, '').replace(/```\n?/gi, '').trim()
+    
+    let initialTags = []
+    try {
+      const firstResult = JSON.parse(firstText)
+      initialTags = firstResult.tags || []
+      console.log('[AI] 第一轮生成的初步标签:', initialTags)
+    } catch (e) {
+      console.error('[AI] 解析第一轮标签失败，使用本地生成')
+      return generateLocalTags(params)
+    }
+    
+    if (initialTags.length === 0) {
+      return generateLocalTags(params)
+    }
+    
+    // ========== 获取所有已有标签 ==========
+    let existingTags = []
+    try {
+      existingTags = await getAllTags()
+      console.log('[AI] 获取到已有标签:', existingTags)
+    } catch (e) {
+      console.warn('[AI] 获取已有标签失败，继续使用初步标签')
+    }
+    
+    // ========== 第二轮：优化标签 ==========
+    console.log('[AI] 开始第二轮标签优化...')
+    const optimizeVariables = {
+      ...baseVariables,
+      initialTags: JSON.stringify(initialTags, null, 2),
+      existingTags: existingTags.length > 0 
+        ? existingTags.join(', ')
+        : '暂无已有标签'
+    }
+    
+    const secondPrompt = replaceTemplateVariables(tagsOptimizePromptTemplate, optimizeVariables)
+    
+    const secondResponse = await fetch(`${apiBaseUrl}/chat/completions`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${apiKey}`
+      },
+      body: JSON.stringify({
+        model: aiModel,
+        messages: [
+          { role: 'user', content: secondPrompt }
+        ],
+        temperature: 0.3,
+        max_tokens: 150
+      })
+    })
+    
+    if (!secondResponse.ok) {
+      console.warn('[AI] 第二轮标签优化失败，返回初步标签')
+      return initialTags
+    }
+    
+    const secondData = await secondResponse.json()
+    let secondText = secondData.choices?.[0]?.message?.content || ''
+    secondText = secondText.replace(/```json\n?/gi, '').replace(/```\n?/gi, '').trim()
+    
+    try {
+      const secondResult = JSON.parse(secondText)
+      const finalTags = secondResult.tags || initialTags
+      console.log('[AI] 第二轮优化后的最终标签:', finalTags)
+      return finalTags
+    } catch (e) {
+      console.warn('[AI] 解析第二轮标签失败，返回初步标签')
+      return initialTags
+    }
+    
   } catch (error) {
     console.error('[AI] 生成标签失败:', error)
     return generateLocalTags(params)

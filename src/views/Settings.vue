@@ -98,6 +98,200 @@
           <p class="input-hint">选择预设模型或手动输入自定义模型名称（如 deepseek-chat 等）</p>
         </div>
         
+        <!-- 高级选项 -->
+        <div class="advanced-options">
+          <button 
+            class="advanced-toggle" 
+            @click="showAdvancedOptions = !showAdvancedOptions"
+            type="button"
+          >
+            <span class="toggle-icon" :class="{ expanded: showAdvancedOptions }">▶</span>
+            <span>高级选项</span>
+            <span class="toggle-hint">温度、最大令牌、上下文等</span>
+          </button>
+          
+          <Transition name="expand">
+            <div v-show="showAdvancedOptions" class="advanced-content">
+              <!-- 温度参数 -->
+              <div class="form-group">
+                <label class="form-label">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M14 14.76V3.5a2.5 2.5 0 0 0-5 0v11.26a4.5 4.5 0 1 0 5 0z"></path>
+                  </svg>
+                  温度 (Temperature)
+                </label>
+                <div class="slider-control">
+                  <input
+                    id="temperature"
+                    v-model.number="config.temperature"
+                    type="range"
+                    min="0"
+                    max="2"
+                    step="0.1"
+                    class="form-slider"
+                  />
+                  <span class="slider-value">{{ config.temperature }}</span>
+                </div>
+                <p class="input-hint">控制输出的随机性：0为确定性输出，越高越创造性（推荐0.7-1.0）</p>
+              </div>
+              
+              <!-- 最大令牌数 -->
+              <div class="form-group">
+                <label for="maxTokens" class="form-label">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+                    <line x1="8" y1="21" x2="16" y2="21"></line>
+                    <line x1="12" y1="17" x2="12" y2="21"></line>
+                  </svg>
+                  最大令牌数 (Max Tokens)
+                </label>
+                <input
+                  id="maxTokens"
+                  v-model.number="config.maxTokens"
+                  type="number"
+                  min="100"
+                  max="8000"
+                  step="100"
+                  placeholder="2048"
+                  class="form-input"
+                />
+                <p class="input-hint">限制AI回复的最大长度，留空表示不限制</p>
+              </div>
+              
+              <!-- 上下文消息数 -->
+              <div class="form-group">
+                <label for="contextMessages" class="form-label">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path>
+                  </svg>
+                  上下文消息数
+                </label>
+                <input
+                  id="contextMessages"
+                  v-model.number="config.contextMessages"
+                  type="number"
+                  min="1"
+                  max="20"
+                  step="1"
+                  placeholder="10"
+                  class="form-input"
+                />
+                <p class="input-hint">保留的对话历史轮数，越多上下文越完整但消耗更多令牌</p>
+              </div>
+              
+              <!-- Top P -->
+              <div class="form-group">
+                <label class="form-label">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <path d="M12 6v6l4 2"></path>
+                  </svg>
+                  Top P (核采样)
+                </label>
+                <div class="slider-control">
+                  <input
+                    id="topP"
+                    v-model.number="config.topP"
+                    type="range"
+                    min="0"
+                    max="1"
+                    step="0.05"
+                    class="form-slider"
+                  />
+                  <span class="slider-value">{{ config.topP }}</span>
+                </div>
+                <p class="input-hint">控制词汇选择的多样性，建议与温度只调整其中一个</p>
+              </div>
+              
+              <!-- 频率惩罚 -->
+              <div class="form-group">
+                <label class="form-label">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path>
+                  </svg>
+                  频率惩罚 (Frequency Penalty)
+                </label>
+                <div class="slider-control">
+                  <input
+                    id="frequencyPenalty"
+                    v-model.number="config.frequencyPenalty"
+                    type="range"
+                    min="-2"
+                    max="2"
+                    step="0.1"
+                    class="form-slider"
+                  />
+                  <span class="slider-value">{{ config.frequencyPenalty }}</span>
+                </div>
+                <p class="input-hint">降低重复用词的概率，正值减少重复</p>
+              </div>
+              
+              <!-- 存在惩罚 -->
+              <div class="form-group">
+                <label class="form-label">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                    <circle cx="12" cy="12" r="3"></circle>
+                  </svg>
+                  存在惩罚 (Presence Penalty)
+                </label>
+                <div class="slider-control">
+                  <input
+                    id="presencePenalty"
+                    v-model.number="config.presencePenalty"
+                    type="range"
+                    min="-2"
+                    max="2"
+                    step="0.1"
+                    class="form-slider"
+                  />
+                  <span class="slider-value">{{ config.presencePenalty }}</span>
+                </div>
+                <p class="input-hint">鼓励讨论新话题，正值增加话题多样性</p>
+              </div>
+              
+              <!-- 超时设置 -->
+              <div class="form-group">
+                <label for="timeout" class="form-label">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <polyline points="12 6 12 12 16 14"></polyline>
+                  </svg>
+                  请求超时 (秒)
+                </label>
+                <input
+                  id="timeout"
+                  v-model.number="config.timeout"
+                  type="number"
+                  min="10"
+                  max="300"
+                  step="10"
+                  placeholder="60"
+                  class="form-input"
+                />
+                <p class="input-hint">API请求的最大等待时间</p>
+              </div>
+              
+              <!-- 流式输出 -->
+              <div class="form-group checkbox-group">
+                <label class="checkbox-label">
+                  <input
+                    type="checkbox"
+                    v-model="config.streamMode"
+                  />
+                  <span class="checkbox-text">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+                    </svg>
+                    启用流式输出 (Stream)
+                  </span>
+                </label>
+                <p class="input-hint">逐字显示AI回复，提升响应感知速度</p>
+              </div>
+            </div>
+          </Transition>
+        </div>
+        
         <div class="form-actions">
           <InkButton
             text="测试连接"
@@ -123,7 +317,57 @@
         </div>
       </section>
       
-
+      <!-- AI 搜索配置模块 -->
+      <section class="settings-section ai-search-section">
+        <h2 class="section-title">
+          <span class="section-icon ai-icon">🔍</span>
+          AI 智能搜索
+        </h2>
+        <p class="section-desc">启用AI智能搜索功能，支持自然语言搜索日记内容</p>
+        
+        <div class="setting-item">
+          <div class="setting-info">
+            <label>启用AI搜索</label>
+            <p>开启后，日记列表页面将显示AI快速搜索和AI深度搜索选项</p>
+          </div>
+          <label class="toggle-switch">
+            <input 
+              type="checkbox" 
+              v-model="config.aiSearchEnabled"
+              @change="saveAISearchConfig"
+            />
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+        
+        <div class="ai-search-info" v-if="config.aiSearchEnabled">
+          <div class="info-item">
+            <span class="info-icon">⚡</span>
+            <div class="info-content">
+              <h4>AI快速搜索</h4>
+              <p>基于日记简述进行智能匹配，适合快速定位相关内容</p>
+            </div>
+          </div>
+          <div class="info-item">
+            <span class="info-icon">🔬</span>
+            <div class="info-content">
+              <h4>AI深度搜索</h4>
+              <p>在快速搜索基础上分析日记正文，适合查找细节信息</p>
+            </div>
+          </div>
+          <div class="info-item">
+            <span class="info-icon">⚠️</span>
+            <div class="info-content">
+              <h4>隐私提醒</h4>
+              <p>AI搜索会将日记标题、简述、正文发送到AI服务提供商</p>
+            </div>
+          </div>
+        </div>
+        
+        <div class="ai-search-note">
+          <p>💡 提示：AI搜索提示词可在"提示词设置"页面自定义</p>
+        </div>
+      </section>
       
       <!-- 本地安全模块 -->
       <section class="settings-section">
@@ -582,7 +826,17 @@ const config = reactive({
   apiKey: '',
   aiModel: 'gpt-4o-mini',
   darkMode: false,
-  defaultVertical: false
+  defaultVertical: false,
+  aiSearchEnabled: false,
+  // 高级选项
+  temperature: 0.7,
+  maxTokens: null,
+  contextMessages: 10,
+  topP: 1.0,
+  frequencyPenalty: 0,
+  presencePenalty: 0,
+  timeout: 60,
+  streamMode: true
 })
 
 // UI 状态
@@ -590,6 +844,7 @@ const showApiKey = ref(false)
 const testing = ref(false)
 const testResult = ref(null)
 const showClearConfirm = ref(false)
+const showAdvancedOptions = ref(false)
 const stats = reactive({
   diaryCount: 0,
   configCount: 0
@@ -657,15 +912,26 @@ async function loadConfig() {
   config.aiModel = await getConfig('aiModel', 'gpt-4o-mini')
   config.darkMode = await getConfig('darkMode', false)
   config.defaultVertical = await getConfig('defaultVertical', false)
+  config.aiSearchEnabled = await getConfig('aiSearchEnabled', false)
   
+  // 加载高级选项
+  config.temperature = await getConfig('temperature', 0.7)
+  config.maxTokens = await getConfig('maxTokens', null)
+  config.contextMessages = await getConfig('contextMessages', 10)
+  config.topP = await getConfig('topP', 1.0)
+  config.frequencyPenalty = await getConfig('frequencyPenalty', 0)
+  config.presencePenalty = await getConfig('presencePenalty', 0)
+  config.timeout = await getConfig('timeout', 60)
+  config.streamMode = await getConfig('streamMode', true)
+
   // 同步模型选择
   syncModelSelection()
-  
+
   // 应用夜读模式
   if (config.darkMode) {
     document.body.classList.add('night-mode')
   }
-  
+
   console.log('[Settings] 配置已加载')
 }
 
@@ -700,6 +966,17 @@ async function doSaveAIConfig() {
     await setConfig('apiBaseUrl', config.apiBaseUrl.trim())
     await setConfig('apiKey', config.apiKey.trim())
     await setConfig('aiModel', config.aiModel)
+    
+    // 保存高级选项
+    await setConfig('temperature', config.temperature)
+    await setConfig('maxTokens', config.maxTokens)
+    await setConfig('contextMessages', config.contextMessages)
+    await setConfig('topP', config.topP)
+    await setConfig('frequencyPenalty', config.frequencyPenalty)
+    await setConfig('presencePenalty', config.presencePenalty)
+    await setConfig('timeout', config.timeout)
+    await setConfig('streamMode', config.streamMode)
+    
     alert('配置已保存')
     console.log('[Settings] AI 配置已保存')
   } catch (error) {
@@ -790,6 +1067,17 @@ function toggleDarkMode() {
   setConfig('darkMode', config.darkMode)
 }
 
+// 保存AI搜索配置
+async function saveAISearchConfig() {
+  try {
+    await setConfig('aiSearchEnabled', config.aiSearchEnabled)
+    console.log('[Settings] AI搜索配置已保存:', config.aiSearchEnabled)
+  } catch (error) {
+    console.error('[Settings] 保存AI搜索配置失败:', error)
+    alert('保存失败: ' + error.message)
+  }
+}
+
 // 密码强度计算
 const passwordStrength = computed(() => {
   if (!exportPassword.value) return { strength: 0, text: '' }
@@ -821,6 +1109,18 @@ function cancelExport() {
   passwordError.value = ''
 }
 
+// 生成易读的导出文件名
+function generateExportFileName(diaryCount) {
+  const now = new Date()
+  const year = now.getFullYear()
+  const month = String(now.getMonth() + 1).padStart(2, '0')
+  const day = String(now.getDate()).padStart(2, '0')
+  const hour = String(now.getHours()).padStart(2, '0')
+  const minute = String(now.getMinutes()).padStart(2, '0')
+  
+  return `墨记_${year}年${month}月${day}日_${hour}时${minute}分_${diaryCount}篇日记.json`
+}
+
 // 确认导出
 async function confirmExport() {
   if (!canExport.value) {
@@ -839,6 +1139,9 @@ async function confirmExport() {
     // 获取数据
     const data = await exportAllData()
     
+    // 获取日记数量
+    const diaryCount = data.diaries?.length || 0
+    
     // 加密数据
     const encryptedData = await encryptData(data, exportPassword.value)
     
@@ -848,7 +1151,7 @@ async function confirmExport() {
     
     const a = document.createElement('a')
     a.href = url
-    a.download = `ink-diary-backup-${new Date().toISOString().split('T')[0]}.encrypted.json`
+    a.download = generateExportFileName(diaryCount)
     document.body.appendChild(a)
     a.click()
     document.body.removeChild(a)
@@ -1867,6 +2170,216 @@ input:checked + .toggle-slider:before {
   line-height: 1.5;
 }
 
+/* AI搜索区块样式 */
+.ai-search-section {
+  background: linear-gradient(135deg, #f8f9ff 0%, rgba(255, 255, 255, 0.95) 100%);
+  border-color: #e0e7ff;
+}
+
+.ai-search-section .section-title {
+  color: #4c51bf;
+}
+
+.ai-search-info {
+  margin-top: 1rem;
+  padding: 1rem;
+  background: rgba(102, 126, 234, 0.05);
+  border-radius: 4px;
+  border: 1px solid #e0e7ff;
+}
+
+.info-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid rgba(102, 126, 234, 0.1);
+}
+
+.info-item:last-child {
+  border-bottom: none;
+}
+
+.info-icon {
+  font-size: 1.25rem;
+  flex-shrink: 0;
+}
+
+.info-content h4 {
+  font-family: "LXGW WenKai", serif;
+  font-size: 0.9375rem;
+  font-weight: 400;
+  color: var(--ink-dark);
+  margin-bottom: 0.25rem;
+}
+
+.info-content p {
+  font-family: "LXGW WenKai", serif;
+  font-size: 0.8125rem;
+  color: var(--ink-sandalwood);
+  margin: 0;
+}
+
+.ai-search-note {
+  margin-top: 1rem;
+  padding: 0.75rem;
+  background: rgba(255, 193, 7, 0.1);
+  border-radius: 4px;
+  border-left: 3px solid #ffc107;
+}
+
+.ai-search-note p {
+  font-family: "LXGW WenKai", serif;
+  font-size: 0.8125rem;
+  color: var(--ink-dark);
+  margin: 0;
+}
+
+/* 高级选项样式 */
+.advanced-options {
+  margin: 1.5rem 0;
+  border: 1px solid var(--ink-rice);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.advanced-toggle {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.875rem 1rem;
+  background: var(--ink-hover);
+  border: none;
+  cursor: pointer;
+  font-family: "LXGW WenKai", serif;
+  font-size: 0.9375rem;
+  color: var(--ink-dark);
+  transition: background 0.3s;
+}
+
+.advanced-toggle:hover {
+  background: var(--ink-rice);
+}
+
+.toggle-icon {
+  font-size: 0.75rem;
+  transition: transform 0.3s;
+  color: var(--ink-sandalwood);
+}
+
+.toggle-icon.expanded {
+  transform: rotate(90deg);
+}
+
+.toggle-hint {
+  margin-left: auto;
+  font-size: 0.8125rem;
+  color: var(--ink-sandalwood);
+}
+
+.advanced-content {
+  padding: 1.25rem;
+  background: var(--ink-paper);
+  border-top: 1px solid var(--ink-rice);
+}
+
+/* 滑块控件 */
+.slider-control {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.form-slider {
+  flex: 1;
+  height: 6px;
+  border-radius: 3px;
+  background: var(--ink-rice);
+  outline: none;
+  -webkit-appearance: none;
+}
+
+.form-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--ink-ochre);
+  cursor: pointer;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  transition: transform 0.2s;
+}
+
+.form-slider::-webkit-slider-thumb:hover {
+  transform: scale(1.2);
+}
+
+.form-slider::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--ink-ochre);
+  cursor: pointer;
+  border: none;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.slider-value {
+  min-width: 48px;
+  text-align: center;
+  font-family: "LXGW WenKai", serif;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  color: var(--ink-ochre);
+  padding: 0.25rem 0.5rem;
+  background: var(--ink-hover);
+  border-radius: 4px;
+}
+
+/* 复选框组 */
+.checkbox-group {
+  margin-top: 0.5rem;
+}
+
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  font-family: "LXGW WenKai", serif;
+  font-size: 0.9375rem;
+  color: var(--ink-dark);
+}
+
+.checkbox-label input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+  accent-color: var(--ink-ochre);
+}
+
+.checkbox-text {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* 展开动画 */
+.expand-enter-active,
+.expand-leave-active {
+  transition: all 0.3s ease;
+  max-height: 2000px;
+  opacity: 1;
+  overflow: hidden;
+}
+
+.expand-enter-from,
+.expand-leave-to {
+  max-height: 0;
+  opacity: 0;
+}
+
 /* 响应式 */
 @media (max-width: 768px) {
   .settings {
@@ -1893,6 +2406,20 @@ input:checked + .toggle-slider:before {
   
   .dialog-actions {
     flex-direction: column;
+  }
+  
+  .slider-control {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.5rem;
+  }
+  
+  .slider-value {
+    align-self: flex-end;
+  }
+  
+  .toggle-hint {
+    display: none;
   }
 }
 </style>
