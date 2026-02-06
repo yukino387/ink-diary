@@ -98,16 +98,20 @@
     </div>
     
     <!-- 删除确认对话框 -->
-    <div v-if="showDeleteConfirm" class="delete-dialog-overlay" @click.self="cancelDelete">
-      <div class="delete-dialog">
-        <h3>确认删除</h3>
-        <p>此操作不可恢复，是否确认删除这篇日记？</p>
-        <div class="dialog-actions">
-          <InkButton text="取消" variant="ghost" @click="cancelDelete" />
-          <InkButton text="确认删除" variant="primary" @click="doDelete" />
+    <Teleport to="body">
+      <Transition name="modal">
+        <div v-if="showDeleteConfirm" class="delete-dialog-overlay" @click.self="cancelDelete">
+          <div class="delete-dialog">
+            <h3>确认删除</h3>
+            <p>此操作不可恢复，是否确认删除这篇日记？</p>
+            <div class="dialog-actions">
+              <InkButton text="取消" variant="ghost" @click="cancelDelete" />
+              <InkButton text="确认删除" variant="primary" @click="doDelete" />
+            </div>
+          </div>
         </div>
-      </div>
-    </div>
+      </Transition>
+    </Teleport>
   </div>
 </template>
 
@@ -509,6 +513,23 @@ watch(() => route.params.id, (newId, oldId) => {
 
 
 
+/* Teleport 模态框过渡动画 */
+.modal-enter-active,
+.modal-leave-active {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.modal-enter-from,
+.modal-leave-to {
+  opacity: 0;
+}
+
+.modal-enter-from .delete-dialog,
+.modal-leave-to .delete-dialog {
+  opacity: 0;
+  transform: translateY(20px) scale(0.95);
+}
+
 /* 删除确认对话框 */
 .delete-dialog-overlay {
   position: fixed;
@@ -520,7 +541,7 @@ watch(() => route.params.id, (newId, oldId) => {
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 1000;
+  z-index: 10000;
 }
 
 .delete-dialog {

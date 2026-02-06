@@ -948,32 +948,42 @@
         </section>
       </div>
       
-      <!-- 操作按钮 -->
-      <div class="actions-section">
-        <InkButton
-          text="💾 保存设置"
-          variant="primary"
-          :loading="saving"
-          @click="savePrompts"
-        />
-        <InkButton
-          text="📤 导出配置"
-          variant="ghost"
-          @click="exportPrompts"
-        />
-        <InkButton
-          text="📥 导入配置"
-          variant="ghost"
-          @click="triggerImport"
-        />
-        <input
-          ref="importInput"
-          type="file"
-          accept=".json"
-          class="hidden"
-          @change="handleImport"
-        />
-      </div>
+      <!-- 底部悬浮操作栏 - 使用 Teleport 传送到 body -->
+      <Teleport to="body">
+        <div v-if="showFloatingDock" class="floating-dock">
+          <div class="floating-dock__content">
+            <InkButton
+              text="💾 保存"
+              variant="ghost"
+              size="small"
+              custom-class="dock-btn dock-btn--primary"
+              :loading="saving"
+              @click="savePrompts"
+            />
+            <InkButton
+              text="📤 导出"
+              variant="ghost"
+              size="small"
+              custom-class="dock-btn"
+              @click="exportPrompts"
+            />
+            <InkButton
+              text="📥 导入"
+              variant="ghost"
+              size="small"
+              custom-class="dock-btn"
+              @click="triggerImport"
+            />
+            <input
+              ref="importInput"
+              type="file"
+              accept=".json"
+              class="hidden"
+              @change="handleImport"
+            />
+          </div>
+        </div>
+      </Teleport>
       
       <!-- 提示 -->
       <div class="tips-section">
@@ -1012,6 +1022,7 @@
 
 <script setup>
 import { ref, reactive, onMounted, computed, nextTick } from 'vue'
+import { useRoute } from 'vue-router'
 import { getConfig, setConfig } from '../modules/db.js'
 import { 
   DEFAULT_SYSTEM_PROMPT, 
@@ -1026,6 +1037,12 @@ import {
   getToolDefinitions
 } from '../modules/ai-search-new.js'
 import InkButton from '../components/InkButton.vue'
+
+// 获取当前路由
+const route = useRoute()
+
+// 计算属性：是否显示悬浮 dock（只在当前页面是提示词设置页时显示）
+const showFloatingDock = computed(() => route.path === '/prompts')
 
 // 示例数据用于预览
 const previewSampleData = {
@@ -2873,16 +2890,199 @@ input:checked + .checkbox-slider:before {
   transform: translateY(5px);
 }
 
-/* ==================== 操作按钮 ==================== */
-.actions-section {
+/* ==================== 悬浮操作栏 ==================== */
+.floating-dock {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 9999;
+  animation: dock-slide-up 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.floating-dock__content {
+  position: relative;
   display: flex;
-  gap: 12px;
-  justify-content: center;
-  flex-wrap: wrap;
-  padding: 24px;
-  background: white;
+  gap: 8px;
+  align-items: center;
+  padding: 10px 16px;
+  /* 多层渐变营造磨砂玻璃深度感 */
+  background:
+    /* 顶部高光 */
+    linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.9) 0%,
+      rgba(255, 255, 255, 0.5) 20%,
+      transparent 50%
+    ),
+    /* 主体渐变 */
+    linear-gradient(
+      135deg,
+      rgba(255, 255, 255, 0.6) 0%,
+      rgba(255, 255, 255, 0.3) 50%,
+      rgba(139, 69, 19, 0.05) 100%
+    );
+  /* 增强磨砂效果 */
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  /* 统一圆角 */
   border-radius: 16px;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+  /* 立体边框 */
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  border-top: 1px solid rgba(255, 255, 255, 0.8);
+  border-bottom: 1px solid rgba(139, 69, 19, 0.1);
+  /* 多层阴影营造立体感 */
+  box-shadow:
+    /* 顶部高光边缘 */
+    inset 0 1px 0 rgba(255, 255, 255, 0.9),
+    /* 内部柔和光 */
+    inset 0 0 20px rgba(255, 255, 255, 0.2),
+    /* 底部暗部 */
+    inset 0 -2px 4px rgba(139, 69, 19, 0.05),
+    /* 外发光 */
+    0 0 0 1px rgba(255, 255, 255, 0.3),
+    /* 主阴影 */
+    0 8px 32px rgba(0, 0, 0, 0.12),
+    0 4px 16px rgba(0, 0, 0, 0.08),
+    /* 顶部反光 */
+    0 -2px 8px rgba(255, 255, 255, 0.5);
+}
+
+/* 玻璃边缘高光效果 */
+.floating-dock__content::before {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.4) 0%,
+    transparent 30%,
+    transparent 70%,
+    rgba(139, 69, 19, 0.08) 100%
+  );
+  border-radius: 18px;
+  z-index: -1;
+  opacity: 0.6;
+  filter: blur(2px);
+}
+
+/* 顶部光泽线条 */
+.floating-dock__content::after {
+  content: '';
+  position: absolute;
+  top: 4px;
+  left: 15%;
+  right: 15%;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.9) 30%,
+    rgba(255, 255, 255, 0.9) 70%,
+    transparent 100%
+  );
+  border-radius: 1px;
+  box-shadow: 0 0 4px rgba(255, 255, 255, 0.8);
+}
+
+/* 考虑左侧导航栏的偏移（桌面端） */
+@media (min-width: 769px) {
+  .floating-dock {
+    left: calc(50% + 100px); /* 200px 导航栏的一半 */
+    transform: translateX(-50%);
+  }
+  
+  .app-nav.nav-collapsed ~ .floating-dock,
+  .app-main:has(.nav-collapsed) ~ .floating-dock {
+    left: calc(50% + 42px); /* 84px 折叠导航栏的一半 */
+  }
+}
+
+/* 移动端：避开底部导航栏 */
+@media (max-width: 768px) {
+  .floating-dock {
+    bottom: 90px; /* 底部导航栏高度约 70px + 间距 */
+    left: 50%;
+    transform: translateX(-50%);
+  }
+}
+
+@keyframes dock-slide-up {
+  0% {
+    transform: translateX(-50%) translateY(100px);
+    opacity: 0;
+  }
+  100% {
+    transform: translateX(-50%) translateY(0);
+    opacity: 1;
+  }
+}
+
+/* Dock 栏按钮样式 - 玻璃效果 */
+.dock-btn {
+  border-radius: 12px;
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(4px);
+}
+
+.dock-btn:hover {
+  background: rgba(255, 255, 255, 0.25);
+  border-color: rgba(255, 255, 255, 0.4);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+/* 主要按钮（保存）特殊样式 - 玻璃效果 */
+.dock-btn--primary {
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  font-weight: 500;
+  position: relative;
+  overflow: hidden;
+}
+
+/* 玻璃光泽效果 */
+.dock-btn--primary::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.3) 50%,
+    transparent 100%
+  );
+  transition: left 0.5s ease;
+}
+
+.dock-btn--primary:hover::before {
+  left: 100%;
+}
+
+.dock-btn--primary:hover {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 255, 255, 0.6);
+  box-shadow: 
+    inset 0 1px 0 rgba(255, 255, 255, 0.4),
+    0 4px 16px rgba(0, 0, 0, 0.1);
+}
+
+/* 桌面端优化 */
+@media (min-width: 769px) {
+  .floating-dock__content {
+    padding: 12px 20px;
+    gap: 12px;
+  }
+  
+  .dock-btn {
+    padding: 10px 20px;
+    font-size: 0.9375rem;
+  }
 }
 
 .hidden {
@@ -3360,8 +3560,9 @@ input:checked + .checkbox-slider:before {
     justify-content: center;
   }
   
-  .actions-section {
-    flex-direction: column;
+  .floating-dock__content {
+    gap: 6px;
+    padding: 6px 10px;
   }
   
   .mood-input-row {

@@ -48,17 +48,20 @@
               <span class="label-icon">💭</span>
               <span>心情</span>
             </label>
-            <div class="setting-grid mood-grid">
+            <div class="setting-grid mood-grid" ref="moodGridRef">
               <button
-                v-for="mood in moodOptions"
+                v-for="(mood, index) in moodOptions"
                 :key="mood.value"
                 :class="['setting-card', 'mood-card', { active: diaryForm.mood === mood.value }]"
                 @click="diaryForm.mood = mood.value"
                 :title="mood.label"
+                ref="moodCardRefs"
               >
                 <span class="card-icon">{{ mood.icon }}</span>
                 <span class="card-name">{{ mood.label }}</span>
               </button>
+              <!-- 玻璃滑块指示器 -->
+              <div class="glass-indicator card-glass" :style="moodGlassStyle"></div>
             </div>
           </div>
           
@@ -68,17 +71,20 @@
               <span class="label-icon">🎨</span>
               <span>风格</span>
             </label>
-            <div class="setting-grid style-grid">
+            <div class="setting-grid style-grid" ref="styleGridRef">
               <button
-                v-for="style in styleOptions"
+                v-for="(style, index) in styleOptions"
                 :key="style.value"
                 :class="['setting-card', 'style-card', { active: diaryForm.style === style.value }]"
                 @click="diaryForm.style = style.value"
                 :title="style.description"
+                ref="styleCardRefs"
               >
                 <span class="card-icon">{{ style.icon }}</span>
                 <span class="card-name">{{ style.label }}</span>
               </button>
+              <!-- 玻璃滑块指示器 -->
+              <div class="glass-indicator card-glass" :style="styleGlassStyle"></div>
             </div>
           </div>
           
@@ -151,16 +157,20 @@
         
         <div class="panel-content editor-scrollable">
           <!-- 模式切换标签 -->
-          <div class="mode-tabs">
+          <div class="mode-tabs" ref="modeTabsRef">
             <button
-              v-for="mode in editModes"
+              v-for="(mode, index) in editModes"
               :key="mode.value"
               :class="['mode-tab', { active: currentMode === mode.value }]"
               @click="switchMode(mode.value)"
+              :data-index="index"
+              ref="modeTabRefs"
             >
               <span class="tab-icon">{{ mode.icon }}</span>
               <span class="tab-label">{{ mode.label }}</span>
             </button>
+            <!-- 玻璃滑块指示器 -->
+            <div class="glass-indicator mode-glass" :style="modeGlassStyle"></div>
           </div>
           
           <!-- 文思模式：标题、日期、正文 -->
@@ -319,10 +329,11 @@
         
         <div class="panel-content panel-full">
           <!-- 视图切换标签 -->
-          <div class="view-tabs">
+          <div class="view-tabs" ref="viewTabsRef">
             <button
               :class="['view-tab', { active: viewMode === 'code' }]"
               @click="viewMode = 'code'"
+              ref="viewTabCodeRef"
             >
               <span class="tab-icon">&lt;/&gt;</span>
               <span>代码</span>
@@ -330,10 +341,13 @@
             <button
               :class="['view-tab', { active: viewMode === 'preview' }]"
               @click="viewMode = 'preview'"
+              ref="viewTabPreviewRef"
             >
               <span class="tab-icon">👁</span>
               <span>预览</span>
             </button>
+            <!-- 玻璃滑块指示器 -->
+            <div class="glass-indicator view-glass" :style="viewGlassStyle"></div>
             <div class="view-actions">
               <button v-if="htmlContent && viewMode === 'code'" class="view-action-btn" @click="copyHtmlContent" title="复制代码">
                 📋
@@ -399,47 +413,55 @@
         </div>
       </div>
     </div>
-  </div>
 
-  <!-- 自定义确认弹窗 -->
-  <div v-if="showConfirmDialog" class="dialog-overlay" @click.self="closeConfirmDialog">
-    <div class="confirm-dialog">
-      <div class="dialog-icon">{{ dialogConfig.icon }}</div>
-      <h3 class="dialog-title">{{ dialogConfig.title }}</h3>
-      <p class="dialog-message">{{ dialogConfig.message }}</p>
-      <div class="dialog-actions">
-        <button 
-          class="dialog-btn dialog-btn-secondary" 
-          @click="closeConfirmDialog"
-        >
-          {{ dialogConfig.cancelText || '取消' }}
-        </button>
-        <button 
-          class="dialog-btn dialog-btn-primary" 
-          :class="dialogConfig.confirmClass"
-          @click="handleConfirm"
-        >
-          {{ dialogConfig.confirmText || '确定' }}
-        </button>
-      </div>
-    </div>
-  </div>
+    <!-- 自定义确认弹窗 -->
+    <Teleport to="body">
+      <Transition name="modal">
+        <div v-if="showConfirmDialog" class="dialog-overlay" @click.self="closeConfirmDialog">
+          <div class="confirm-dialog">
+            <div class="dialog-icon">{{ dialogConfig.icon }}</div>
+            <h3 class="dialog-title">{{ dialogConfig.title }}</h3>
+            <p class="dialog-message">{{ dialogConfig.message }}</p>
+            <div class="dialog-actions">
+              <button
+                class="dialog-btn dialog-btn-secondary"
+                @click="closeConfirmDialog"
+              >
+                {{ dialogConfig.cancelText || '取消' }}
+              </button>
+              <button
+                class="dialog-btn dialog-btn-primary"
+                :class="dialogConfig.confirmClass"
+                @click="handleConfirm"
+              >
+                {{ dialogConfig.confirmText || '确定' }}
+              </button>
+            </div>
+          </div>
+        </div>
+      </Transition>
+    </Teleport>
 
-  <!-- 自定义提示弹窗 -->
-  <div v-if="showAlertDialog" class="dialog-overlay" @click.self="closeAlertDialog">
-    <div class="confirm-dialog alert-dialog">
-      <div class="dialog-icon">{{ dialogConfig.icon }}</div>
-      <h3 class="dialog-title">{{ dialogConfig.title }}</h3>
-      <p class="dialog-message">{{ dialogConfig.message }}</p>
-      <div class="dialog-actions">
-        <button 
-          class="dialog-btn dialog-btn-primary" 
-          @click="closeAlertDialog"
-        >
-          {{ dialogConfig.confirmText || '确定' }}
-        </button>
-      </div>
-    </div>
+    <!-- 自定义提示弹窗 -->
+    <Teleport to="body">
+      <Transition name="modal">
+        <div v-if="showAlertDialog" class="dialog-overlay" @click.self="closeAlertDialog">
+          <div class="confirm-dialog alert-dialog">
+            <div class="dialog-icon">{{ dialogConfig.icon }}</div>
+            <h3 class="dialog-title">{{ dialogConfig.title }}</h3>
+            <p class="dialog-message">{{ dialogConfig.message }}</p>
+            <div class="dialog-actions">
+              <button
+                class="dialog-btn dialog-btn-primary"
+                @click="closeAlertDialog"
+              >
+                {{ dialogConfig.confirmText || '确定' }}
+              </button>
+            </div>
+          </div>
+        </div>
+      </Transition>
+    </Teleport>
   </div>
 </template>
 
@@ -476,6 +498,104 @@ const router = useRouter()
 
 const styleOptions = STYLE_OPTIONS
 const moodOptions = MOOD_OPTIONS
+
+// 标签引用
+const modeTabsRef = ref(null)
+const modeTabRefs = ref([])
+const viewTabsRef = ref(null)
+const viewTabCodeRef = ref(null)
+const viewTabPreviewRef = ref(null)
+const moodGridRef = ref(null)
+const moodCardRefs = ref([])
+const styleGridRef = ref(null)
+const styleCardRefs = ref([])
+
+// 玻璃滑块样式 - 模式切换
+const modeGlassStyle = computed(() => {
+  const index = editModes.findIndex(m => m.value === currentMode.value)
+  if (index === -1 || !modeTabRefs.value[index]) {
+    return { opacity: 0 }
+  }
+  const tab = modeTabRefs.value[index]
+  const container = modeTabsRef.value
+  if (!tab || !container) return { opacity: 0 }
+
+  const containerRect = container.getBoundingClientRect()
+  const tabRect = tab.getBoundingClientRect()
+
+  return {
+    opacity: 1,
+    left: `${tabRect.left - containerRect.left}px`,
+    width: `${tabRect.width}px`,
+    height: `${tabRect.height}px`,
+    transition: 'all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)'
+  }
+})
+
+// 玻璃滑块样式 - 视图切换
+const viewGlassStyle = computed(() => {
+  const isCode = viewMode.value === 'code'
+  const tab = isCode ? viewTabCodeRef.value : viewTabPreviewRef.value
+  const container = viewTabsRef.value
+  if (!tab || !container) return { opacity: 0 }
+
+  const containerRect = container.getBoundingClientRect()
+  const tabRect = tab.getBoundingClientRect()
+
+  return {
+    opacity: 1,
+    left: `${tabRect.left - containerRect.left}px`,
+    width: `${tabRect.width}px`,
+    height: `${tabRect.height}px`,
+    transition: 'all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)'
+  }
+})
+
+// 玻璃滑块样式 - 心情选择
+const moodGlassStyle = computed(() => {
+  const index = moodOptions.findIndex(m => m.value === diaryForm.value.mood)
+  if (index === -1 || !moodCardRefs.value[index]) {
+    return { opacity: 0 }
+  }
+  const card = moodCardRefs.value[index]
+  const container = moodGridRef.value
+  if (!card || !container) return { opacity: 0 }
+
+  const containerRect = container.getBoundingClientRect()
+  const cardRect = card.getBoundingClientRect()
+
+  return {
+    opacity: 1,
+    left: `${cardRect.left - containerRect.left}px`,
+    top: `${cardRect.top - containerRect.top}px`,
+    width: `${cardRect.width}px`,
+    height: `${cardRect.height}px`,
+    transition: 'all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)'
+  }
+})
+
+// 玻璃滑块样式 - 风格选择
+const styleGlassStyle = computed(() => {
+  const index = styleOptions.findIndex(s => s.value === diaryForm.value.style)
+  if (index === -1 || !styleCardRefs.value[index]) {
+    return { opacity: 0 }
+  }
+  const card = styleCardRefs.value[index]
+  const container = styleGridRef.value
+  if (!card || !container) return { opacity: 0 }
+
+  const containerRect = container.getBoundingClientRect()
+  const cardRect = card.getBoundingClientRect()
+
+  return {
+    opacity: 1,
+    left: `${cardRect.left - containerRect.left}px`,
+    top: `${cardRect.top - containerRect.top}px`,
+    width: `${cardRect.width}px`,
+    height: `${cardRect.height}px`,
+    transition: 'all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)'
+  }
+})
 
 // 编辑模式
 const editModes = [
@@ -1225,6 +1345,15 @@ function handleKeyboardShortcuts(e) {
 // 窗口大小变化处理
 function handleResize() {
   checkMobile()
+  // 触发重新计算玻璃滑块位置
+  const currentMood = diaryForm.value.mood
+  const currentStyle = diaryForm.value.style
+  diaryForm.value.mood = ''
+  diaryForm.value.style = ''
+  nextTick(() => {
+    diaryForm.value.mood = currentMood
+    diaryForm.value.style = currentStyle
+  })
 }
 
 // 组件挂载时初始化
@@ -1249,6 +1378,292 @@ onUnmounted(() => {
   saveDraft()
 })
 </script>
+
+<style>
+/* ========================================
+   全局弹窗样式 - 国风风格
+   ======================================== */
+
+/* Teleport 模态框过渡动画 */
+.modal-enter-active,
+.modal-leave-active {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.modal-enter-from,
+.modal-leave-to {
+  opacity: 0;
+}
+
+.modal-enter-from .confirm-dialog,
+.modal-leave-to .confirm-dialog {
+  opacity: 0;
+  transform: translateY(30px) scale(0.95);
+}
+
+/* 弹窗遮罩层 */
+.dialog-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, rgba(44, 62, 80, 0.7) 0%, rgba(44, 62, 80, 0.5) 100%);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+}
+
+@keyframes overlayFadeIn {
+  from { 
+    opacity: 0;
+    backdrop-filter: blur(0px);
+    -webkit-backdrop-filter: blur(0px);
+  }
+  to { 
+    opacity: 1;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+  }
+}
+
+/* 弹窗容器 */
+.confirm-dialog {
+  background: linear-gradient(135deg, rgba(254, 252, 245, 0.95) 0%, rgba(253, 251, 245, 0.98) 100%);
+  padding: 2rem 2.5rem;
+  border-radius: 16px;
+  box-shadow: 
+    0 25px 80px rgba(0, 0, 0, 0.25),
+    0 0 0 1px rgba(139, 69, 19, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.5);
+  text-align: center;
+  max-width: 420px;
+  width: 90%;
+  animation: dialogPopIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  position: relative;
+  transform-origin: center center;
+}
+
+@keyframes dialogPopIn {
+  0% {
+    opacity: 0;
+    transform: translateY(30px) scale(0.9);
+  }
+  70% {
+    transform: translateY(-5px) scale(1.02);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* 弹窗图标 */
+.dialog-icon {
+  font-size: 3.5rem;
+  margin-bottom: 1.25rem;
+  animation: iconBounce 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  display: inline-block;
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.1));
+}
+
+@keyframes iconBounce {
+  0% { 
+    transform: scale(0) rotate(-180deg);
+    opacity: 0;
+  }
+  50% { 
+    transform: scale(1.3) rotate(10deg);
+  }
+  70% {
+    transform: scale(0.9) rotate(-5deg);
+  }
+  100% { 
+    transform: scale(1) rotate(0deg);
+    opacity: 1;
+  }
+}
+
+/* 弹窗标题 */
+.dialog-title {
+  font-family: "LXGW WenKai", serif;
+  font-size: 1.375rem;
+  font-weight: 500;
+  color: var(--ink-dark);
+  margin-bottom: 0.75rem;
+  letter-spacing: 0.05em;
+}
+
+/* 弹窗消息 */
+.dialog-message {
+  font-family: "LXGW WenKai", serif;
+  font-size: 0.9375rem;
+  color: var(--ink-sandalwood);
+  margin-bottom: 1.75rem;
+  line-height: 1.7;
+}
+
+/* 弹窗按钮组 */
+.dialog-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+}
+
+/* 弹窗按钮基础样式 */
+.dialog-btn {
+  font-family: "LXGW WenKai", serif;
+  font-size: 0.9375rem;
+  padding: 0.625rem 1.75rem;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  border: none;
+  outline: none;
+  letter-spacing: 0.05em;
+  position: relative;
+  overflow: hidden;
+}
+
+.dialog-btn::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.3);
+  transform: translate(-50%, -50%);
+  transition: width 0.4s ease, height 0.4s ease;
+}
+
+.dialog-btn:active::before {
+  width: 200%;
+  height: 200%;
+}
+
+/* 主要按钮 */
+.dialog-btn-primary {
+  background: linear-gradient(135deg, var(--ink-ochre) 0%, #a0522d 100%);
+  color: var(--ink-paper);
+  box-shadow: 0 4px 12px rgba(139, 69, 19, 0.3);
+}
+
+.dialog-btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(139, 69, 19, 0.4);
+}
+
+.dialog-btn-primary:active {
+  transform: translateY(0);
+}
+
+/* 次要按钮 */
+.dialog-btn-secondary {
+  background: transparent;
+  color: var(--ink-sandalwood);
+  border: 1px solid var(--ink-rice);
+}
+
+.dialog-btn-secondary:hover {
+  border-color: var(--ink-ochre);
+  color: var(--ink-ochre);
+  background: rgba(139, 69, 19, 0.05);
+}
+
+/* 危险操作按钮 */
+.dialog-btn-danger {
+  background: linear-gradient(135deg, #dc3545 0%, #c82333 100%) !important;
+  box-shadow: 0 4px 12px rgba(220, 53, 69, 0.3) !important;
+}
+
+.dialog-btn-danger:hover {
+  box-shadow: 0 6px 16px rgba(220, 53, 69, 0.4) !important;
+}
+
+/* 成功按钮 */
+.dialog-btn-success {
+  background: linear-gradient(135deg, #28a745 0%, #218838 100%) !important;
+  box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3) !important;
+}
+
+.dialog-btn-success:hover {
+  box-shadow: 0 6px 16px rgba(40, 167, 69, 0.4) !important;
+}
+
+/* 提示弹窗特殊样式 */
+.alert-dialog .dialog-icon {
+  color: var(--ink-ochre);
+}
+
+/* 弹窗关闭动画 */
+.dialog-overlay.closing {
+  animation: overlayFadeOut 0.25s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+.dialog-overlay.closing .confirm-dialog {
+  animation: dialogPopOut 0.25s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+@keyframes overlayFadeOut {
+  from { 
+    opacity: 1;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+  }
+  to { 
+    opacity: 0;
+    backdrop-filter: blur(0px);
+    -webkit-backdrop-filter: blur(0px);
+  }
+}
+
+@keyframes dialogPopOut {
+  from {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(20px) scale(0.9);
+  }
+}
+
+/* 弹窗响应式适配 */
+@media (max-width: 480px) {
+  .confirm-dialog {
+    padding: 1.5rem 1.75rem;
+    margin: 1rem;
+    width: calc(100% - 2rem);
+  }
+  
+  .dialog-icon {
+    font-size: 2.5rem;
+  }
+  
+  .dialog-title {
+    font-size: 1.25rem;
+  }
+  
+  .dialog-message {
+    font-size: 0.875rem;
+  }
+  
+  .dialog-actions {
+    flex-direction: column-reverse;
+    gap: 0.75rem;
+  }
+  
+  .dialog-btn {
+    width: 100%;
+    padding: 0.75rem 1.5rem;
+  }
+}
+</style>
 
 <style scoped>
 /* 页面进入动画 */
@@ -1300,18 +1715,41 @@ onUnmounted(() => {
   letter-spacing: 0.1em;
 }
 
-/* 墨迹分隔线 */
+/* 墨迹分隔线 - 清晰国风效果 */
 .ink-divider-ink {
   height: 2px;
   background: linear-gradient(
     to right,
     transparent 0%,
-    var(--ink-dark) 10%,
-    var(--ink-dark) 30%,
-    rgba(44, 62, 80, 0.2) 50%,
+    #8b4513 5%,
+    #5d3a1a 20%,
+    #8b4513 40%,
+    #a0522d 60%,
+    #8b4513 80%,
     transparent 100%
   );
   flex-shrink: 0;
+  position: relative;
+  box-shadow: 0 1px 2px rgba(139, 69, 19, 0.2);
+}
+
+/* 底部墨晕 */
+.ink-divider-ink::after {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 5%;
+  right: 10%;
+  height: 4px;
+  background: linear-gradient(
+    to right,
+    transparent 0%,
+    rgba(139, 69, 19, 0.15) 20%,
+    rgba(139, 69, 19, 0.25) 50%,
+    rgba(139, 69, 19, 0.15) 80%,
+    transparent 100%
+  );
+  filter: blur(1px);
 }
 
 /* 三栏布局主体 */
@@ -1389,21 +1827,18 @@ onUnmounted(() => {
   border-left: 1px solid var(--ink-rice);
 }
 
-/* 分割线 */
+/* 分割线 - 清晰国风设计 */
 .resizer {
-  width: 6px;
-  background: transparent;
+  width: 4px;
+  background: #d4c4b0;
   cursor: col-resize;
   position: relative;
   flex-shrink: 0;
-  transition: background 0.2s ease;
+  border-left: 1px solid #c4b4a0;
+  border-right: 1px solid #c4b4a0;
 }
 
-.resizer:hover,
-.resizer.active {
-  background: var(--ink-ochre);
-}
-
+/* 中央实心装饰条 */
 .resizer::after {
   content: '';
   position: absolute;
@@ -1411,14 +1846,23 @@ onUnmounted(() => {
   left: 50%;
   transform: translate(-50%, -50%);
   width: 2px;
-  height: 24px;
-  background: var(--ink-rice);
+  height: 40px;
+  background: #8b4513;
   border-radius: 1px;
+}
+
+/* 悬停效果 */
+.resizer:hover,
+.resizer.active {
+  background: #c4b4a0;
+  border-color: #8b4513;
 }
 
 .resizer:hover::after,
 .resizer.active::after {
-  background: var(--ink-paper);
+  width: 2px;
+  height: 60px;
+  background: #5d3a1a;
 }
 
 /* 模式切换标签 */
@@ -1428,6 +1872,7 @@ onUnmounted(() => {
   border-bottom: 1px solid var(--ink-rice);
   padding-bottom: 0.5rem;
   flex-shrink: 0;
+  position: relative;
 }
 
 .mode-tab {
@@ -1443,20 +1888,74 @@ onUnmounted(() => {
   border-radius: 6px;
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  z-index: 1;
 }
 
 .mode-tab:hover {
   color: var(--ink-dark);
-  background-color: var(--ink-hover);
 }
 
 .mode-tab.active {
-  background-color: var(--ink-ochre);
-  color: var(--ink-paper);
+  color: var(--ink-ochre);
 }
 
 .tab-icon {
   font-size: 1rem;
+}
+
+/* 玻璃滑块指示器 - 增强立体感，更通透 */
+.glass-indicator {
+  position: absolute;
+  background:
+    /* 顶部高光 */
+    linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.6) 0%,
+      rgba(255, 255, 255, 0.2) 30%,
+      transparent 60%
+    ),
+    /* 主体通透层 */
+    linear-gradient(
+      135deg,
+      rgba(255, 255, 255, 0.25) 0%,
+      rgba(255, 255, 255, 0.1) 50%,
+      rgba(139, 69, 19, 0.03) 100%
+    );
+  backdrop-filter: blur(8px) saturate(120%);
+  -webkit-backdrop-filter: blur(8px) saturate(120%);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  border-top: 1px solid rgba(255, 255, 255, 0.6);
+  border-radius: 8px;
+  box-shadow:
+    /* 顶部高光边缘 */
+    inset 0 1px 0 rgba(255, 255, 255, 0.8),
+    /* 内部柔和光 */
+    inset 0 0 12px rgba(255, 255, 255, 0.2),
+    /* 主阴影 - 玻璃厚度感 */
+    0 4px 16px rgba(139, 69, 19, 0.12),
+    /* 底部阴影 */
+    0 2px 6px rgba(0, 0, 0, 0.06),
+    /* 外边缘光 */
+    0 0 0 1px rgba(255, 255, 255, 0.2);
+  pointer-events: none;
+  z-index: 100;
+  opacity: 0;
+}
+
+/* 模式切换玻璃滑块 */
+.mode-glass {
+  top: 0;
+}
+
+/* 视图切换玻璃滑块 */
+.view-glass {
+  top: 0.5rem;
+}
+
+/* 卡片玻璃滑块 - 与模式/视图切换保持一致 */
+.card-glass {
+  border-radius: 8px;
 }
 
 /* 设置组样式 */
@@ -1491,10 +1990,12 @@ onUnmounted(() => {
 
 .mood-grid {
   grid-template-columns: repeat(2, 1fr);
+  position: relative;
 }
 
 .style-grid {
   grid-template-columns: repeat(2, 1fr);
+  position: relative;
 }
 
 .setting-card {
@@ -1510,19 +2011,19 @@ onUnmounted(() => {
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   min-height: 50px;
+  position: relative;
+  z-index: 1;
 }
 
 .setting-card:hover {
   transform: translateY(-2px);
   border-color: var(--ink-sandalwood);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 }
 
+/* 选中状态：去除背景和边框，让玻璃滑块显示更清晰 */
 .setting-card.active {
-  background: linear-gradient(135deg, var(--ink-ochre) 0%, #a0522d 100%);
-  border-color: var(--ink-ochre);
-  color: var(--ink-paper);
-  box-shadow: 0 4px 12px rgba(139, 69, 19, 0.3);
+  background: transparent;
+  border-color: transparent;
 }
 
 .card-icon {
@@ -1540,11 +2041,6 @@ onUnmounted(() => {
   font-size: 0.6875rem;
   white-space: nowrap;
   font-weight: 500;
-}
-
-.style-card.active {
-  background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
-  border-color: #2c3e50;
 }
 
 /* 设置文本框 */
@@ -1934,6 +2430,7 @@ onUnmounted(() => {
   background: linear-gradient(135deg, rgba(139, 69, 19, 0.03) 0%, rgba(139, 69, 19, 0.01) 100%);
   border-bottom: 1px solid var(--ink-rice);
   flex-shrink: 0;
+  position: relative;
 }
 
 .view-tab {
@@ -1949,16 +2446,16 @@ onUnmounted(() => {
   border-radius: 6px;
   cursor: pointer;
   transition: all 0.3s ease;
+  position: relative;
+  z-index: 1;
 }
 
 .view-tab:hover {
   color: var(--ink-dark);
-  background-color: rgba(139, 69, 19, 0.05);
 }
 
 .view-tab.active {
-  background-color: var(--ink-ochre);
-  color: var(--ink-paper);
+  color: var(--ink-ochre);
 }
 
 .view-actions {
@@ -2307,210 +2804,6 @@ onUnmounted(() => {
   .view-tab {
     padding: 0.375rem 0.625rem;
     font-size: 0.75rem;
-  }
-}
-
-/* ========================================
-   自定义弹窗样式 - 国风风格
-   ======================================== */
-
-/* 弹窗遮罩层 */
-.dialog-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(44, 62, 80, 0.5);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
-  animation: fadeIn 0.2s ease;
-  backdrop-filter: blur(2px);
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-
-/* 弹窗容器 */
-.confirm-dialog {
-  background: linear-gradient(135deg, var(--ink-paper) 0%, #fdfbf5 100%);
-  padding: 2rem 2.5rem;
-  border-radius: 12px;
-  box-shadow: 
-    0 20px 60px rgba(0, 0, 0, 0.2),
-    0 0 0 1px rgba(139, 69, 19, 0.1);
-  text-align: center;
-  max-width: 400px;
-  width: 90%;
-  animation: slideUp 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  position: relative;
-}
-
-@keyframes slideUp {
-  from {
-    opacity: 0;
-    transform: translateY(20px) scale(0.95);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
-}
-
-/* 弹窗图标 */
-.dialog-icon {
-  font-size: 3rem;
-  margin-bottom: 1rem;
-  animation: bounceIn 0.5s ease;
-}
-
-@keyframes bounceIn {
-  0% { transform: scale(0); }
-  50% { transform: scale(1.2); }
-  100% { transform: scale(1); }
-}
-
-/* 弹窗标题 */
-.dialog-title {
-  font-family: "LXGW WenKai", serif;
-  font-size: 1.375rem;
-  font-weight: 500;
-  color: var(--ink-dark);
-  margin-bottom: 0.75rem;
-  letter-spacing: 0.05em;
-}
-
-/* 弹窗消息 */
-.dialog-message {
-  font-family: "LXGW WenKai", serif;
-  font-size: 0.9375rem;
-  color: var(--ink-sandalwood);
-  margin-bottom: 1.75rem;
-  line-height: 1.7;
-}
-
-/* 弹窗按钮组 */
-.dialog-actions {
-  display: flex;
-  gap: 1rem;
-  justify-content: center;
-}
-
-/* 弹窗按钮基础样式 */
-.dialog-btn {
-  font-family: "LXGW WenKai", serif;
-  font-size: 0.9375rem;
-  padding: 0.625rem 1.75rem;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-  border: none;
-  outline: none;
-  letter-spacing: 0.05em;
-}
-
-/* 主要按钮 */
-.dialog-btn-primary {
-  background: linear-gradient(135deg, var(--ink-ochre) 0%, #a0522d 100%);
-  color: var(--ink-paper);
-  box-shadow: 0 4px 12px rgba(139, 69, 19, 0.3);
-}
-
-.dialog-btn-primary:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(139, 69, 19, 0.4);
-}
-
-.dialog-btn-primary:active {
-  transform: translateY(0);
-}
-
-/* 次要按钮 */
-.dialog-btn-secondary {
-  background: transparent;
-  color: var(--ink-sandalwood);
-  border: 1px solid var(--ink-rice);
-}
-
-.dialog-btn-secondary:hover {
-  border-color: var(--ink-ochre);
-  color: var(--ink-ochre);
-  background: rgba(139, 69, 19, 0.05);
-}
-
-/* 危险操作按钮 */
-.dialog-btn-danger {
-  background: linear-gradient(135deg, #dc3545 0%, #c82333 100%) !important;
-  box-shadow: 0 4px 12px rgba(220, 53, 69, 0.3) !important;
-}
-
-.dialog-btn-danger:hover {
-  box-shadow: 0 6px 16px rgba(220, 53, 69, 0.4) !important;
-}
-
-/* 成功按钮 */
-.dialog-btn-success {
-  background: linear-gradient(135deg, #28a745 0%, #218838 100%) !important;
-  box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3) !important;
-}
-
-.dialog-btn-success:hover {
-  box-shadow: 0 6px 16px rgba(40, 167, 69, 0.4) !important;
-}
-
-/* 提示弹窗特殊样式 */
-.alert-dialog .dialog-icon {
-  color: var(--ink-ochre);
-}
-
-/* 弹窗关闭动画 */
-.dialog-overlay.closing .confirm-dialog {
-  animation: slideDown 0.2s ease forwards;
-}
-
-@keyframes slideDown {
-  from {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
-  to {
-    opacity: 0;
-    transform: translateY(10px) scale(0.95);
-  }
-}
-
-/* 弹窗响应式适配 */
-@media (max-width: 480px) {
-  .confirm-dialog {
-    padding: 1.5rem 1.75rem;
-    margin: 1rem;
-    width: calc(100% - 2rem);
-  }
-  
-  .dialog-icon {
-    font-size: 2.5rem;
-  }
-  
-  .dialog-title {
-    font-size: 1.25rem;
-  }
-  
-  .dialog-message {
-    font-size: 0.875rem;
-  }
-  
-  .dialog-actions {
-    flex-direction: column-reverse;
-    gap: 0.75rem;
-  }
-  
-  .dialog-btn {
-    width: 100%;
-    padding: 0.75rem 1.5rem;
   }
 }
 </style>

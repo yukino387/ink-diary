@@ -56,35 +56,43 @@
       </div>
       
       <!-- 搜索模式切换 -->
-      <div class="search-modes">
+      <div class="search-modes" ref="searchModesRef">
+        <!-- 玻璃滑块指示器 -->
+        <div class="glass-indicator search-mode-glass" :style="searchModeGlassStyle"></div>
         <button 
           class="mode-btn"
           :class="{ active: searchMode === 'normal' }"
           @click="setSearchMode('normal')"
           title="普通关键词搜索"
+          ref="modeBtnNormalRef"
         >
           <span class="mode-icon">🔍</span>
           <span class="mode-text">普通</span>
+          <span class="mode-lock-placeholder"></span>
         </button>
         <button 
           class="mode-btn"
           :class="{ active: searchMode === 'quick', disabled: !aiSearchEnabled }"
           @click="aiSearchEnabled ? setSearchMode('quick') : showAIEnableHint()"
           :title="aiSearchEnabled ? 'AI快速搜索：基于简述分析' : '请在设置中启用AI搜索功能'"
+          ref="modeBtnQuickRef"
         >
           <span class="mode-icon">⚡</span>
           <span class="mode-text">AI快速</span>
           <span v-if="!aiSearchEnabled" class="mode-lock">🔒</span>
+          <span v-else class="mode-lock-placeholder"></span>
         </button>
         <button 
           class="mode-btn"
           :class="{ active: searchMode === 'deep', disabled: !aiSearchEnabled }"
           @click="aiSearchEnabled ? setSearchMode('deep') : showAIEnableHint()"
           :title="aiSearchEnabled ? 'AI深度搜索：分析正文内容' : '请在设置中启用AI搜索功能'"
+          ref="modeBtnDeepRef"
         >
           <span class="mode-icon">🔬</span>
           <span class="mode-text">AI深度</span>
           <span v-if="!aiSearchEnabled" class="mode-lock">🔒</span>
+          <span v-else class="mode-lock-placeholder"></span>
         </button>
       </div>
       
@@ -222,32 +230,38 @@
       </div>
       
       <!-- 排序选项 -->
-      <div class="sort-options">
-        <InkButton
-          text="最新"
-          size="small"
-          :variant="sortBy === 'createTime' ? 'primary' : 'ghost'"
+      <div class="sort-options" ref="sortOptionsRef">
+        <!-- 玻璃滑块指示器 -->
+        <div class="glass-indicator sort-glass" :style="sortGlassStyle"></div>
+        <button
+          :class="['sort-btn', { active: sortBy === 'createTime' }]"
           @click="setSort('createTime')"
-        />
-        <InkButton
-          text="标题"
-          size="small"
-          :variant="sortBy === 'title' ? 'primary' : 'ghost'"
+          ref="sortBtnCreateRef"
+        >
+          最新
+        </button>
+        <button
+          :class="['sort-btn', { active: sortBy === 'title' }]"
           @click="setSort('title')"
-        />
-        <InkButton
-          text="更新"
-          size="small"
-          :variant="sortBy === 'updateTime' ? 'primary' : 'ghost'"
+          ref="sortBtnTitleRef"
+        >
+          标题
+        </button>
+        <button
+          :class="['sort-btn', { active: sortBy === 'updateTime' }]"
           @click="setSort('updateTime')"
-        />
-        <InkButton
+          ref="sortBtnUpdateRef"
+        >
+          更新
+        </button>
+        <button
           v-if="isAISearchMode"
-          text="相关度"
-          size="small"
-          :variant="sortBy === 'relevance' ? 'primary' : 'ghost'"
+          :class="['sort-btn', { active: sortBy === 'relevance' }]"
           @click="setSort('relevance')"
-        />
+          ref="sortBtnRelevanceRef"
+        >
+          相关度
+        </button>
       </div>
     </div>
     
@@ -387,7 +401,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, watch } from 'vue'
+import { ref, computed, onMounted, watch, nextTick } from 'vue'
 import { useRouter } from 'vue-router'
 import { 
   getAllDiaries, 
@@ -434,6 +448,86 @@ const sortOrder = ref('desc')
 // 搜索模式
 const searchMode = ref('normal') // 'normal' | 'quick' | 'deep'
 const aiSearchEnabled = ref(false)
+
+// 搜索模式切换引用
+const searchModesRef = ref(null)
+const modeBtnNormalRef = ref(null)
+const modeBtnQuickRef = ref(null)
+const modeBtnDeepRef = ref(null)
+
+// 搜索模式玻璃滑块样式
+const searchModeGlassStyle = computed(() => {
+  let btnRef
+  switch (searchMode.value) {
+    case 'normal':
+      btnRef = modeBtnNormalRef.value
+      break
+    case 'quick':
+      btnRef = modeBtnQuickRef.value
+      break
+    case 'deep':
+      btnRef = modeBtnDeepRef.value
+      break
+    default:
+      return { opacity: 0 }
+  }
+  
+  const container = searchModesRef.value
+  if (!btnRef || !container) return { opacity: 0 }
+
+  const containerRect = container.getBoundingClientRect()
+  const btnRect = btnRef.getBoundingClientRect()
+
+  return {
+    opacity: 1,
+    left: `${btnRect.left - containerRect.left}px`,
+    width: `${btnRect.width}px`,
+    height: `${btnRect.height}px`,
+    transition: 'all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)'
+  }
+})
+
+// 排序选项引用
+const sortOptionsRef = ref(null)
+const sortBtnCreateRef = ref(null)
+const sortBtnTitleRef = ref(null)
+const sortBtnUpdateRef = ref(null)
+const sortBtnRelevanceRef = ref(null)
+
+// 排序选项玻璃滑块样式
+const sortGlassStyle = computed(() => {
+  let btnRef
+  switch (sortBy.value) {
+    case 'createTime':
+      btnRef = sortBtnCreateRef.value
+      break
+    case 'title':
+      btnRef = sortBtnTitleRef.value
+      break
+    case 'updateTime':
+      btnRef = sortBtnUpdateRef.value
+      break
+    case 'relevance':
+      btnRef = sortBtnRelevanceRef.value
+      break
+    default:
+      return { opacity: 0 }
+  }
+  
+  const container = sortOptionsRef.value
+  if (!btnRef || !container) return { opacity: 0 }
+
+  const containerRect = container.getBoundingClientRect()
+  const btnRect = btnRef.getBoundingClientRect()
+
+  return {
+    opacity: 1,
+    left: `${btnRect.left - containerRect.left}px`,
+    width: `${btnRect.width}px`,
+    height: `${btnRect.height}px`,
+    transition: 'all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)'
+  }
+})
 
 // AI 搜索状态（新架构）
 const aiSearchStatus = ref({
@@ -540,7 +634,11 @@ async function loadDiaries() {
 // 加载配置
 async function loadConfig() {
   try {
-    aiSearchEnabled.value = await getConfig('aiSearchEnabled', false)
+    // 检查是否启用了AI搜索，同时需要检查是否同意了AI免责声明
+    const aiEnabled = await getConfig('aiSearchEnabled', false)
+    const hasAgreedDisclaimer = await getConfig('aiDisclaimerAgreed', false)
+    // 只有两者都满足才启用AI搜索
+    aiSearchEnabled.value = aiEnabled && hasAgreedDisclaimer
   } catch (error) {
     console.error('[DiaryList] 加载配置失败:', error)
   }
@@ -562,12 +660,29 @@ function setSearchMode(mode) {
   if (mode === 'normal') {
     // 切换回普通模式时重置AI搜索状态
     resetAISearch()
+    // 如果当前排序是相关度，切换回最新排序
+    if (sortBy.value === 'relevance') {
+      sortBy.value = 'createTime'
+    }
   }
+  // 等待DOM更新后重新计算玻璃滑块位置
+  nextTick(() => {
+    const currentSort = sortBy.value
+    sortBy.value = ''
+    nextTick(() => {
+      sortBy.value = currentSort
+    })
+  })
 }
 
 // 显示AI启用提示
-function showAIEnableHint() {
-  alert('请在左侧菜单的"设置"中，启用"AI智能搜索"功能后使用')
+async function showAIEnableHint() {
+  const hasAgreedDisclaimer = await getConfig('aiDisclaimerAgreed', false)
+  if (!hasAgreedDisclaimer) {
+    alert('使用AI搜索功能前，请先前往"设置"页面同意AI功能免责声明。')
+  } else {
+    alert('请在左侧菜单的"设置"中，启用"AI智能搜索"功能后使用')
+  }
 }
 
 // 重置 AI 搜索状态
@@ -975,6 +1090,18 @@ onMounted(() => {
   loadDiaries()
   loadFilterData()
   loadConfig()
+  // 初始化玻璃滑块位置
+  nextTick(() => {
+    // 触发一次搜索模式和排序的重新计算
+    const currentSearchMode = searchMode.value
+    const currentSort = sortBy.value
+    searchMode.value = ''
+    sortBy.value = ''
+    nextTick(() => {
+      searchMode.value = currentSearchMode
+      sortBy.value = currentSort
+    })
+  })
 })
 
 // 监听搜索模式变化
@@ -1181,6 +1308,7 @@ watch(searchMode, (newMode) => {
   gap: 0.75rem;
   justify-content: center;
   flex-wrap: wrap;
+  position: relative;
 }
 
 .mode-btn {
@@ -1196,6 +1324,8 @@ watch(searchMode, (newMode) => {
   cursor: pointer;
   transition: all 0.25s ease;
   color: var(--ink-sandalwood);
+  position: relative;
+  z-index: 1;
 }
 
 .mode-btn:hover {
@@ -1205,10 +1335,53 @@ watch(searchMode, (newMode) => {
 }
 
 .mode-btn.active {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-  border-color: #667eea;
-  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+  background: transparent;
+  border-color: transparent;
+  color: var(--ink-ochre);
+}
+
+/* 搜索模式玻璃滑块 */
+.search-mode-glass {
+  border-radius: 20px;
+  top: 0;
+}
+
+/* 玻璃滑块指示器 - 与DiaryEditor保持一致 */
+.glass-indicator {
+  position: absolute;
+  background:
+    /* 顶部高光 */
+    linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.6) 0%,
+      rgba(255, 255, 255, 0.2) 30%,
+      transparent 60%
+    ),
+    /* 主体通透层 */
+    linear-gradient(
+      135deg,
+      rgba(255, 255, 255, 0.25) 0%,
+      rgba(255, 255, 255, 0.1) 50%,
+      rgba(139, 69, 19, 0.03) 100%
+    );
+  backdrop-filter: blur(8px) saturate(120%);
+  -webkit-backdrop-filter: blur(8px) saturate(120%);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  border-top: 1px solid rgba(255, 255, 255, 0.6);
+  box-shadow:
+    /* 顶部高光边缘 */
+    inset 0 1px 0 rgba(255, 255, 255, 0.8),
+    /* 内部柔和光 */
+    inset 0 0 12px rgba(255, 255, 255, 0.2),
+    /* 主阴影 - 玻璃厚度感 */
+    0 4px 16px rgba(139, 69, 19, 0.12),
+    /* 底部阴影 */
+    0 2px 6px rgba(0, 0, 0, 0.06),
+    /* 外边缘光 */
+    0 0 0 1px rgba(255, 255, 255, 0.2);
+  pointer-events: none;
+  z-index: 100;
+  opacity: 0;
 }
 
 .mode-btn.disabled {
@@ -1232,6 +1405,11 @@ watch(searchMode, (newMode) => {
 
 .mode-lock {
   font-size: 0.75rem;
+  margin-left: 2px;
+}
+
+.mode-lock-placeholder {
+  width: 0.75rem;
   margin-left: 2px;
 }
 
@@ -2068,6 +2246,35 @@ watch(searchMode, (newMode) => {
   display: flex;
   gap: 0.5rem;
   justify-content: flex-end;
+  position: relative;
+}
+
+.sort-btn {
+  font-family: "LXGW WenKai", serif;
+  font-size: 0.875rem;
+  padding: 0.375rem 0.875rem;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  color: var(--ink-sandalwood);
+  position: relative;
+  z-index: 1;
+}
+
+.sort-btn:hover {
+  color: var(--ink-dark);
+}
+
+.sort-btn.active {
+  color: var(--ink-ochre);
+}
+
+/* 排序玻璃滑块 */
+.sort-glass {
+  border-radius: 6px;
+  top: 0;
 }
 
 /* 已选筛选条件 */

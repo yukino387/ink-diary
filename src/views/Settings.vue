@@ -7,12 +7,14 @@
     </header>
     
     <!-- 墨迹分隔线 -->
-    <div class="ink-divider"></div>
+    <div class="ink-divider">
+      <div class="ink-drop-animation"></div>
+    </div>
     
     <!-- 设置内容 -->
     <div class="settings__content">
       <!-- AI 配置模块 -->
-      <section class="settings-section">
+      <section class="settings-section" style="--section-index: 0">
         <h2 class="section-title">
           <span class="section-icon">🤖</span>
           AI 配置
@@ -318,7 +320,7 @@
       </section>
       
       <!-- AI 搜索配置模块 -->
-      <section class="settings-section ai-search-section">
+      <section class="settings-section ai-search-section" style="--section-index: 1">
         <h2 class="section-title">
           <span class="section-icon ai-icon">🔍</span>
           AI 智能搜索
@@ -370,7 +372,7 @@
       </section>
       
       <!-- 本地安全模块 -->
-      <section class="settings-section">
+      <section class="settings-section" style="--section-index: 2">
         <h2 class="section-title">
           <span class="section-icon">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -437,7 +439,7 @@
       </section>
       
       <!-- 数据管理模块 -->
-      <section class="settings-section">
+      <section class="settings-section" style="--section-index: 3">
         <h2 class="section-title">
           <span class="section-icon">💾</span>
           数据管理
@@ -519,7 +521,7 @@
       </section>
       
       <!-- 关于与法律声明模块 -->
-      <section class="settings-section about-section">
+      <section class="settings-section about-section" style="--section-index: 4">
         <div class="about-content">
           <div class="about-logo">
             <div class="logo-circle">
@@ -569,6 +571,28 @@
             </div>
           </div>
           
+          <!-- 快速链接 -->
+          <div class="quick-links">
+            <h4>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="2" y1="12" x2="22" y2="12"></line>
+                <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+              </svg>
+              快速链接
+            </h4>
+            <div class="links-list">
+              <button class="link-btn" @click="showWelcomeGuide">
+                <span class="link-icon">👋</span>
+                <span>查看欢迎页面</span>
+              </button>
+              <button class="link-btn" @click="resetPrivacyAgreement">
+                <span class="link-icon">📜</span>
+                <span>重新查看隐私协议</span>
+              </button>
+            </div>
+          </div>
+
           <div class="about-features compact">
             <div class="feature-item">
               <div class="feature-icon-wrapper">
@@ -609,189 +633,242 @@
               <span>日记管理</span>
             </div>
           </div>
-          
+
           <p class="copyright">墨记 Ink Diary v3.0.0 · MIT License · 部分代码由 AI 辅助生成</p>
         </div>
       </section>
     </div>
     
     <!-- AI 免责声明对话框 -->
-    <div v-if="showDisclaimerDialog" class="dialog-overlay disclaimer-overlay" @click.self>
-      <div class="confirm-dialog disclaimer-dialog">
-        <h3>
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
-            <line x1="12" y1="9" x2="12" y2="13"></line>
-            <line x1="12" y1="17" x2="12.01" y2="17"></line>
-          </svg>
-          AI 功能免责声明
-        </h3>
-        <div class="disclaimer-content">
-          <div class="disclaimer-section warning">
-            <h4>⚠️ 数据上传警告</h4>
-            <p>使用 AI 功能时，您的以下数据将被发送到您配置的 AI 服务提供商（如 OpenAI、Azure 等）：</p>
-            <ul>
-              <li>日记标题和正文内容</li>
-              <li>选择的心情标签和视觉风格</li>
-              <li>系统提示词和用户提示词模板</li>
-            </ul>
-          </div>
-          
-          <div class="disclaimer-section">
-            <h4>🔒 隐私风险说明</h4>
-            <ul>
-              <li>您的日记内容将离开本地设备，传输到第三方服务器</li>
-              <li>数据将受 AI 服务提供商的隐私政策约束</li>
-              <li>请勿在 AI 功能中输入高度敏感或机密信息</li>
-              <li>本地存储的日记始终加密保存在您的设备上</li>
-            </ul>
-          </div>
-          
-          <div class="disclaimer-section">
-            <h4>📋 免责声明</h4>
-            <ul>
-              <li>作者不对 AI 服务提供商的数据处理行为承担任何责任</li>
-              <li>用户需自行评估并承担使用 AI 功能的风险</li>
-              <li>建议仔细阅读所配置的 AI 服务提供商的隐私政策</li>
-            </ul>
-          </div>
-          
-          <div class="disclaimer-timer" v-if="disclaimerCountdown > 0">
-            请仔细阅读以上内容（{{ disclaimerCountdown }}秒）
+    <Teleport to="body">
+      <Transition name="modal">
+        <div v-if="showDisclaimerDialog" class="dialog-overlay disclaimer-overlay" @click.self>
+          <div class="confirm-dialog disclaimer-dialog">
+            <h3>
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+                <line x1="12" y1="9" x2="12" y2="13"></line>
+                <line x1="12" y1="17" x2="12.01" y2="17"></line>
+              </svg>
+              AI 功能免责声明
+            </h3>
+            <div class="disclaimer-content">
+              <div class="disclaimer-section warning">
+                <h4>⚠️ 重要：数据将离开您的设备</h4>
+                <p>启用 AI 功能后，您的以下数据将被发送到您配置的第三方 AI 服务提供商（如 OpenAI、Azure、Anthropic 等）：</p>
+                <ul>
+                  <li><strong>日记内容：</strong>日记标题、正文内容、心情标签、视觉风格等</li>
+                  <li><strong>搜索查询：</strong>您输入的 AI 搜索关键词和查询内容</li>
+                  <li><strong>配置信息：</strong>系统提示词、用户提示词模板等 AI 相关配置</li>
+                </ul>
+                <p class="warning-highlight"><strong>请注意：这些数据将通过网络传输到第三方服务器，不再仅保存在您的本地设备上。</strong></p>
+              </div>
+
+              <div class="disclaimer-section">
+                <h4>🔒 隐私与安全风险</h4>
+                <ul>
+                  <li><strong>数据传输风险：</strong>您的日记内容将离开本地设备，通过互联网传输到第三方 AI 服务提供商的服务器</li>
+                  <li><strong>第三方隐私政策：</strong>数据将受您选择的 AI 服务提供商的隐私政策和服务条款约束，作者无法控制其数据处理行为</li>
+                  <li><strong>数据保留：</strong>第三方服务提供商可能会根据其政策保留、处理或分析您的数据</li>
+                  <li><strong>敏感信息警告：</strong>请勿在 AI 功能中输入高度敏感、机密或个人隐私信息，包括但不限于身份证号、银行账户、密码等</li>
+                  <li><strong>本地数据安全：</strong>未使用 AI 功能的日记内容始终加密保存在您的本地设备上，不会自动上传</li>
+                </ul>
+              </div>
+
+              <div class="disclaimer-section">
+                <h4>⚖️ 责任限制与免责声明</h4>
+                <ul>
+                  <li><strong>第三方服务责任：</strong>作者不对任何 AI 服务提供商的服务可用性、数据安全性、隐私保护或数据处理行为承担任何责任</li>
+                  <li><strong>使用风险自担：</strong>您明确理解并同意，使用 AI 功能的风险完全由您自行承担</li>
+                  <li><strong>内容准确性：</strong>AI 生成的内容可能包含错误、偏见或不适当信息，作者不对其准确性、完整性或适用性承担任何责任</li>
+                  <li><strong>服务变更：</strong>第三方 AI 服务提供商可能随时变更其服务条款、价格或隐私政策，作者不对此承担任何责任</li>
+                  <li><strong>法律合规：</strong>您需确保使用 AI 功能符合您所在国家/地区的法律法规</li>
+                </ul>
+              </div>
+
+              <div class="disclaimer-section">
+                <h4>📋 使用建议</h4>
+                <ul>
+                  <li>在启用 AI 功能前，请仔细阅读您选择的 AI 服务提供商的隐私政策和服务条款</li>
+                  <li>考虑使用匿名账户或限制分享敏感信息</li>
+                  <li>定期检查并清理 AI 相关的历史记录（如提供商支持）</li>
+                  <li>如不再需要 AI 功能，可在设置中关闭，关闭后不再发送新数据</li>
+                </ul>
+              </div>
+
+              <div class="disclaimer-timer" v-if="disclaimerCountdown > 0">
+                <span class="timer-icon">⏳</span>
+                请仔细阅读以上内容（{{ disclaimerCountdown }}秒）
+              </div>
+            </div>
+
+            <div class="disclaimer-checkbox">
+              <label class="checkbox-label">
+                <input
+                  v-model="disclaimerChecked"
+                  type="checkbox"
+                  :disabled="disclaimerCountdown > 0"
+                />
+                <span>我已阅读并知晓上述风险，自愿承担使用 AI 功能的责任</span>
+              </label>
+            </div>
+
+            <div class="dialog-actions">
+              <InkButton
+                text="取消"
+                variant="ghost"
+                @click="cancelDisclaimer"
+              />
+              <InkButton
+                text="确认并保存"
+                variant="primary"
+                :disabled="disclaimerCountdown > 0 || !disclaimerChecked"
+                @click="confirmDisclaimer"
+              />
+            </div>
           </div>
         </div>
-        
-        <div class="disclaimer-checkbox">
-          <label class="checkbox-label">
-            <input
-              v-model="disclaimerChecked"
-              type="checkbox"
-              :disabled="disclaimerCountdown > 0"
-            />
-            <span>我已阅读并知晓上述风险，自愿承担使用 AI 功能的责任</span>
-          </label>
-        </div>
-        
-        <div class="dialog-actions">
-          <InkButton 
-            text="取消" 
-            variant="ghost" 
-            @click="cancelDisclaimer" 
-          />
-          <InkButton 
-            text="确认并保存" 
-            variant="primary" 
-            :disabled="disclaimerCountdown > 0 || !disclaimerChecked"
-            @click="confirmDisclaimer" 
-          />
-        </div>
-      </div>
-    </div>
+      </Transition>
+    </Teleport>
     
     <!-- 导出密码对话框 -->
-    <div v-if="showExportDialog" class="dialog-overlay" @click.self="cancelExport">
-      <div class="confirm-dialog">
-        <h3>加密导出数据</h3>
-        <p>请设置导出密码，用于保护您的备份文件。密码长度至少6位。</p>
-        <div class="password-input-group">
-          <input
-            v-model="exportPassword"
-            type="password"
-            placeholder="设置导出密码"
-            class="form-input"
-            @keyup.enter="confirmExport"
-          />
-          <input
-            v-model="exportPasswordConfirm"
-            type="password"
-            placeholder="确认密码"
-            class="form-input"
-            @keyup.enter="confirmExport"
-          />
-          <p v-if="passwordError" class="error-text">{{ passwordError }}</p>
-          <p v-else-if="exportPassword" class="password-strength" :class="passwordStrengthClass">
-            {{ passwordStrengthText }}
-          </p>
+    <Teleport to="body">
+      <Transition name="modal">
+        <div v-if="showExportDialog" class="dialog-overlay" @click.self="cancelExport">
+          <div class="confirm-dialog">
+            <h3>加密导出数据</h3>
+            <p>请设置导出密码，用于保护您的备份文件。密码长度至少6位。</p>
+            <div class="password-input-group">
+              <input
+                v-model="exportPassword"
+                type="password"
+                placeholder="设置导出密码"
+                class="form-input"
+                @keyup.enter="confirmExport"
+              />
+              <input
+                v-model="exportPasswordConfirm"
+                type="password"
+                placeholder="确认密码"
+                class="form-input"
+                @keyup.enter="confirmExport"
+              />
+              <p v-if="passwordError" class="error-text">{{ passwordError }}</p>
+              <p v-else-if="exportPassword" class="password-strength" :class="passwordStrengthClass">
+                {{ passwordStrengthText }}
+              </p>
+            </div>
+            <div class="dialog-actions">
+              <InkButton text="取消" variant="ghost" @click="cancelExport" />
+              <InkButton
+                text="确认导出"
+                variant="primary"
+                :loading="exporting"
+                :disabled="!canExport"
+                @click="confirmExport"
+              />
+            </div>
+          </div>
         </div>
-        <div class="dialog-actions">
-          <InkButton text="取消" variant="ghost" @click="cancelExport" />
-          <InkButton 
-            text="确认导出" 
-            variant="primary" 
-            :loading="exporting"
-            :disabled="!canExport"
-            @click="confirmExport" 
-          />
-        </div>
-      </div>
-    </div>
-    
+      </Transition>
+    </Teleport>
+
+    <!-- 导出进度弹窗 -->
+    <ExportProgress
+      :show="showExportProgress"
+      :progress="exportProgress"
+      :current-step="exportCurrentStep"
+      :is-complete="exportIsComplete"
+      :diary-count="exportDiaryCount"
+    />
+
     <!-- 导入密码对话框 -->
-    <div v-if="showImportPasswordDialog" class="dialog-overlay" @click.self="cancelImportPassword">
-      <div class="confirm-dialog">
-        <h3>解密导入数据</h3>
-        <p>请输入备份文件的解密密码。系统将自动合并与现有数据重复的内容。</p>
-        <div class="password-input-group">
-          <input
-            v-model="importPassword"
-            type="password"
-            placeholder="输入解密密码"
-            class="form-input"
-            @keyup.enter="confirmImport"
-          />
-          <p v-if="importError" class="error-text">{{ importError }}</p>
+    <Teleport to="body">
+      <Transition name="modal">
+        <div v-if="showImportPasswordDialog" class="dialog-overlay" @click.self="cancelImportPassword">
+          <div class="confirm-dialog">
+            <h3>解密导入数据</h3>
+            <p>请输入备份文件的解密密码。系统将自动合并与现有数据重复的内容。</p>
+            <div class="password-input-group">
+              <input
+                v-model="importPassword"
+                type="password"
+                placeholder="输入解密密码"
+                class="form-input"
+                @keyup.enter="confirmImport"
+              />
+              <p v-if="importError" class="error-text">{{ importError }}</p>
+            </div>
+            <div class="dialog-actions">
+              <InkButton text="取消" variant="ghost" @click="cancelImportPassword" />
+              <InkButton
+                text="确认导入"
+                variant="primary"
+                :loading="importing"
+                :disabled="!importPassword"
+                @click="confirmImport"
+              />
+            </div>
+          </div>
         </div>
-        <div class="dialog-actions">
-          <InkButton text="取消" variant="ghost" @click="cancelImportPassword" />
-          <InkButton 
-            text="确认导入" 
-            variant="primary" 
-            :loading="importing"
-            :disabled="!importPassword"
-            @click="confirmImport" 
-          />
-        </div>
-      </div>
-    </div>
+      </Transition>
+    </Teleport>
     
     <!-- 导入结果对话框 -->
-    <div v-if="showImportResult" class="dialog-overlay" @click.self="closeImportResult">
-      <div class="confirm-dialog">
-        <h3>导入完成</h3>
-        <div class="import-result">
-          <div class="result-item success">
-            <span class="result-number">{{ importResult.added }}</span>
-            <span class="result-label">新增日记</span>
-          </div>
-          <div class="result-item info">
-            <span class="result-number">{{ importResult.updated }}</span>
-            <span class="result-label">更新日记</span>
-          </div>
-          <div class="result-item">
-            <span class="result-number">{{ importResult.skipped }}</span>
-            <span class="result-label">跳过重复</span>
+    <Teleport to="body">
+      <Transition name="modal">
+        <div v-if="showImportResult" class="dialog-overlay" @click.self="closeImportResult">
+          <div class="confirm-dialog">
+            <h3>导入完成</h3>
+            <div class="import-result">
+              <div class="result-item success">
+                <span class="result-number">{{ importResult.added }}</span>
+                <span class="result-label">新增日记</span>
+              </div>
+              <div class="result-item info">
+                <span class="result-number">{{ importResult.updated }}</span>
+                <span class="result-label">更新日记</span>
+              </div>
+              <div class="result-item">
+                <span class="result-number">{{ importResult.skipped }}</span>
+                <span class="result-label">跳过重复</span>
+              </div>
+            </div>
+            <p class="result-detail">
+              配置项：{{ importResult.importedConfig }} 项 · 提示词：{{ importResult.importedPrompts }} 项
+            </p>
+            <div class="dialog-actions">
+              <InkButton text="确定" variant="primary" @click="closeImportResult" />
+            </div>
           </div>
         </div>
-        <p class="result-detail">
-          配置项：{{ importResult.importedConfig }} 项 · 提示词：{{ importResult.importedPrompts }} 项
-        </p>
-        <div class="dialog-actions">
-          <InkButton text="确定" variant="primary" @click="closeImportResult" />
-        </div>
-      </div>
-    </div>
+      </Transition>
+    </Teleport>
     
     <!-- 清空确认对话框 -->
-    <div v-if="showClearConfirm" class="dialog-overlay" @click.self="cancelClear">
-      <div class="confirm-dialog">
-        <h3>确认清空所有数据</h3>
-        <p>此操作将永久删除所有日记、配置和提示词设置，不可恢复。是否继续？</p>
-        <div class="dialog-actions">
-          <InkButton text="取消" variant="ghost" @click="cancelClear" />
-          <InkButton text="确认清空" variant="primary" @click="doClear" />
+    <Teleport to="body">
+      <Transition name="modal">
+        <div v-if="showClearConfirm" class="dialog-overlay" @click.self="cancelClear">
+          <div class="confirm-dialog">
+            <h3>确认清空所有数据</h3>
+            <p>此操作将永久删除所有日记、配置和提示词设置，不可恢复。是否继续？</p>
+            <div class="dialog-actions">
+              <InkButton text="取消" variant="ghost" @click="cancelClear" />
+              <InkButton text="确认清空" variant="primary" @click="doClear" />
+            </div>
+          </div>
         </div>
-      </div>
-    </div>
+      </Transition>
+    </Teleport>
+
+    <!-- 清空进度弹窗 -->
+    <ClearDataProgress
+      :show="showClearProgress"
+      :progress="clearProgress"
+      :current-step="clearCurrentStep"
+      :is-complete="clearIsComplete"
+      :diary-count="clearDiaryCount"
+    />
   </div>
 </template>
 
@@ -809,6 +886,8 @@ import {
 import { testAIConnection } from '../modules/ai-client.js'
 import { encryptData, decryptData, validatePassword, clearLocalStorageKey } from '../modules/crypto.js'
 import InkButton from '../components/InkButton.vue'
+import ExportProgress from '../components/ExportProgress.vue'
+import ClearDataProgress from '../components/ClearDataProgress.vue'
 
 /**
  * Settings - 设置页面
@@ -859,6 +938,20 @@ const exportPassword = ref('')
 const exportPasswordConfirm = ref('')
 const passwordError = ref('')
 const exporting = ref(false)
+
+// 导出进度弹窗状态
+const showExportProgress = ref(false)
+const exportProgress = ref(0)
+const exportCurrentStep = ref(0)
+const exportIsComplete = ref(false)
+const exportDiaryCount = ref(0)
+
+// 清空进度弹窗状态
+const showClearProgress = ref(false)
+const clearProgress = ref(0)
+const clearCurrentStep = ref(0)
+const clearIsComplete = ref(false)
+const clearDiaryCount = ref(0)
 
 // 导入相关状态
 const importInput = ref(null)
@@ -987,13 +1080,30 @@ async function doSaveAIConfig() {
 
 // 启动免责声明倒计时
 function startDisclaimerTimer() {
+  // 清除现有计时器
+  if (disclaimerTimer) {
+    clearInterval(disclaimerTimer)
+    disclaimerTimer = null
+  }
+  // 重置倒计时
+  disclaimerCountdown.value = 10
+  // 启动新计时器
   disclaimerTimer = setInterval(() => {
     if (disclaimerCountdown.value > 0) {
       disclaimerCountdown.value--
     } else {
       clearInterval(disclaimerTimer)
+      disclaimerTimer = null
     }
   }, 1000)
+}
+
+// 停止免责声明倒计时
+function stopDisclaimerTimer() {
+  if (disclaimerTimer) {
+    clearInterval(disclaimerTimer)
+    disclaimerTimer = null
+  }
 }
 
 // 取消免责声明
@@ -1002,10 +1112,7 @@ function cancelDisclaimer() {
   disclaimerChecked.value = false
   disclaimerCountdown.value = 10
   pendingSaveConfig = null
-  if (disclaimerTimer) {
-    clearInterval(disclaimerTimer)
-    disclaimerTimer = null
-  }
+  stopDisclaimerTimer()
 }
 
 // 确认免责声明并保存
@@ -1019,13 +1126,18 @@ async function confirmDisclaimer() {
     // 关闭对话框
     showDisclaimerDialog.value = false
     disclaimerChecked.value = false
-    if (disclaimerTimer) {
-      clearInterval(disclaimerTimer)
-      disclaimerTimer = null
+    stopDisclaimerTimer()
+    
+    // 如果有待保存的配置，执行保存
+    if (pendingSaveConfig) {
+      await doSaveAIConfig()
     }
     
-    // 执行保存
-    await doSaveAIConfig()
+    // 如果用户正在尝试启用AI搜索，则启用它
+    if (!config.aiSearchEnabled) {
+      config.aiSearchEnabled = true
+      await setConfig('aiSearchEnabled', true)
+    }
     
     console.log('[Settings] 用户已同意 AI 免责声明')
   } catch (error) {
@@ -1069,6 +1181,21 @@ function toggleDarkMode() {
 
 // 保存AI搜索配置
 async function saveAISearchConfig() {
+  // 如果用户尝试启用AI搜索，检查是否已同意免责声明
+  if (config.aiSearchEnabled) {
+    const hasAgreed = await getConfig('aiDisclaimerAgreed', false)
+    if (!hasAgreed) {
+      // 显示免责声明对话框
+      showDisclaimerDialog.value = true
+      disclaimerChecked.value = false
+      disclaimerCountdown.value = 10
+      startDisclaimerTimer()
+      // 临时关闭开关，等待用户同意
+      config.aiSearchEnabled = false
+      return
+    }
+  }
+  
   try {
     await setConfig('aiSearchEnabled', config.aiSearchEnabled)
     console.log('[Settings] AI搜索配置已保存:', config.aiSearchEnabled)
@@ -1121,6 +1248,32 @@ function generateExportFileName(diaryCount) {
   return `墨记_${year}年${month}月${day}日_${hour}时${minute}分_${diaryCount}篇日记.json`
 }
 
+// 模拟进度更新
+function updateExportProgress(targetProgress, duration = 500) {
+  const startProgress = exportProgress.value
+  const startTime = Date.now()
+
+  return new Promise(resolve => {
+    function animate() {
+      const elapsed = Date.now() - startTime
+      const progress = Math.min(elapsed / duration, 1)
+      exportProgress.value = startProgress + (targetProgress - startProgress) * progress
+
+      if (progress < 1) {
+        requestAnimationFrame(animate)
+      } else {
+        resolve()
+      }
+    }
+    animate()
+  })
+}
+
+// 延迟函数
+function delay(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms))
+}
+
 // 确认导出
 async function confirmExport() {
   if (!canExport.value) {
@@ -1131,39 +1284,76 @@ async function confirmExport() {
     }
     return
   }
-  
+
   exporting.value = true
   passwordError.value = ''
-  
+
+  // 关闭密码对话框，显示进度弹窗
+  showExportDialog.value = false
+  showExportProgress.value = true
+  exportProgress.value = 0
+  exportCurrentStep.value = 0
+  exportIsComplete.value = false
+
   try {
+    // 步骤 1: 准备数据 (0-25%)
+    await updateExportProgress(25, 600)
+    exportCurrentStep.value = 1
+    await delay(200) // 步骤完成后短暂停顿
+
     // 获取数据
     const data = await exportAllData()
-    
-    // 获取日记数量
     const diaryCount = data.diaries?.length || 0
-    
+    exportDiaryCount.value = diaryCount
+
+    // 步骤 2: 加密处理 (25-75%) - 加密阶段最长，让用户看清楚
+    await updateExportProgress(50, 800)
+    exportCurrentStep.value = 2
+    await delay(300) // 加密阶段多停顿一会儿
+
     // 加密数据
     const encryptedData = await encryptData(data, exportPassword.value)
-    
+
+    await updateExportProgress(75, 600)
+    await delay(200)
+
+    // 步骤 3: 生成文件 (75-100%)
+    exportCurrentStep.value = 3
+
     // 下载文件
     const blob = new Blob([JSON.stringify(encryptedData, null, 2)], { type: 'application/json' })
     const url = URL.createObjectURL(blob)
-    
+
     const a = document.createElement('a')
     a.href = url
     a.download = generateExportFileName(diaryCount)
     document.body.appendChild(a)
     a.click()
     document.body.removeChild(a)
-    
+
     URL.revokeObjectURL(url)
-    
-    // 关闭对话框
-    cancelExport()
+
+    await updateExportProgress(100, 400)
+    await delay(200)
+
+    // 完成
+    exportIsComplete.value = true
     console.log('[Settings] 数据已加密导出')
+
+    // 2秒后关闭进度弹窗
+    setTimeout(() => {
+      showExportProgress.value = false
+      // 重置状态
+      exportPassword.value = ''
+      exportPasswordConfirm.value = ''
+      passwordError.value = ''
+    }, 2000)
+
   } catch (error) {
     console.error('[Settings] 导出失败:', error)
     passwordError.value = '导出失败: ' + error.message
+    showExportProgress.value = false
+    showExportDialog.value = true
   } finally {
     exporting.value = false
   }
@@ -1251,19 +1441,71 @@ function cancelClear() {
   showClearConfirm.value = false
 }
 
+// 模拟清空进度更新
+function updateClearProgress(targetProgress, duration = 500) {
+  const startProgress = clearProgress.value
+  const startTime = Date.now()
+
+  return new Promise(resolve => {
+    function animate() {
+      const elapsed = Date.now() - startTime
+      const progress = Math.min(elapsed / duration, 1)
+      clearProgress.value = startProgress + (targetProgress - startProgress) * progress
+
+      if (progress < 1) {
+        requestAnimationFrame(animate)
+      } else {
+        resolve()
+      }
+    }
+    animate()
+  })
+}
+
 // 执行清空
 async function doClear() {
+  // 关闭确认对话框，显示进度弹窗
+  showClearConfirm.value = false
+  showClearProgress.value = true
+  clearProgress.value = 0
+  clearCurrentStep.value = 0
+  clearIsComplete.value = false
+  clearDiaryCount.value = stats.diaryCount
+
   try {
+    // 步骤 1: 删除日记 (0-30%)
+    await updateClearProgress(30, 500)
+    clearCurrentStep.value = 1
+    await delay(200)
+
+    // 步骤 2: 清除配置 (30-70%)
+    await updateClearProgress(70, 600)
+    clearCurrentStep.value = 2
+    await delay(200)
+
+    // 步骤 3: 释放空间 (70-100%)
+    clearCurrentStep.value = 3
+    await updateClearProgress(100, 400)
+    await delay(200)
+
+    // 实际执行清空
     await clearAllData()
-    alert('所有数据已清空')
-    showClearConfirm.value = false
-    
-    // 重新加载
-    await loadStats()
-    
+
+    // 完成
+    clearIsComplete.value = true
     console.log('[Settings] 数据已清空')
+
+    // 2秒后关闭进度弹窗
+    setTimeout(() => {
+      showClearProgress.value = false
+      alert('所有数据已清空')
+      // 重新加载
+      loadStats()
+    }, 2000)
+
   } catch (error) {
     console.error('[Settings] 清空失败:', error)
+    showClearProgress.value = false
     alert('清空失败: ' + error.message)
   }
 }
@@ -1308,6 +1550,22 @@ async function loadLocalEncryptionStatus() {
   hasLocalPassword.value = enabled
 }
 
+// 显示欢迎页面
+function showWelcomeGuide() {
+  // 触发自定义事件，让 App.vue 显示欢迎页面
+  window.dispatchEvent(new CustomEvent('show-welcome-guide'))
+  console.log('[Settings] 请求显示欢迎页面')
+}
+
+// 重置隐私协议状态
+async function resetPrivacyAgreement() {
+  if (confirm('确定要重新查看隐私协议吗？\n\n这将重置您的协议同意状态，下次启动时会再次显示隐私协议。')) {
+    await setConfig('privacyAgreementAgreed', false)
+    alert('隐私协议状态已重置，请刷新页面或重新启动应用以查看协议。')
+    console.log('[Settings] 隐私协议状态已重置')
+  }
+}
+
 // 组件挂载时初始化
 onMounted(() => {
   loadConfig()
@@ -1328,6 +1586,7 @@ onMounted(() => {
 .settings__header {
   text-align: center;
   margin-bottom: 2rem;
+  animation: fadeInDown 0.6s ease-out;
 }
 
 .page-title {
@@ -1337,17 +1596,20 @@ onMounted(() => {
   color: var(--ink-dark);
   letter-spacing: 0.15em;
   margin-bottom: 0.5rem;
+  animation: fadeInUp 0.8s ease-out 0.1s both;
 }
 
 .page-subtitle {
   font-family: "LXGW WenKai", serif;
   font-size: 1rem;
   color: var(--ink-sandalwood);
+  animation: fadeInUp 0.8s ease-out 0.2s both;
 }
 
 /* 分隔线 */
 .ink-divider {
-  height: 1px;
+  position: relative;
+  height: 2px;
   background: linear-gradient(
     to right,
     transparent 0%,
@@ -1356,6 +1618,32 @@ onMounted(() => {
     transparent 100%
   );
   margin-bottom: 2rem;
+  overflow: visible;
+}
+
+/* 墨迹滴落动画 */
+.ink-drop-animation {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 8px;
+  height: 8px;
+  background: var(--ink-ochre);
+  border-radius: 50%;
+  opacity: 0.6;
+  animation: inkSpread 3s ease-in-out infinite;
+}
+
+@keyframes inkSpread {
+  0%, 100% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 0.6;
+  }
+  50% {
+    transform: translate(-50%, -50%) scale(1.5);
+    opacity: 0.3;
+  }
 }
 
 /* 设置内容 */
@@ -1369,8 +1657,41 @@ onMounted(() => {
 .settings-section {
   background-color: var(--ink-paper);
   border: 1px solid var(--ink-rice);
-  border-radius: 2px;
+  border-radius: 8px;
   padding: 1.5rem;
+  animation: fadeInUp 0.6s ease-out both;
+  animation-delay: calc(var(--section-index) * 0.1s + 0.3s);
+  transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.settings-section:hover {
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+  transform: translateY(-2px);
+  border-color: var(--ink-sandalwood);
+}
+
+/* 入场动画 */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .section-title {
@@ -1382,10 +1703,26 @@ onMounted(() => {
   font-weight: 400;
   color: var(--ink-dark);
   margin-bottom: 0.5rem;
+  transition: all 0.3s ease;
 }
 
 .section-icon {
   font-size: 1.25rem;
+  display: inline-flex;
+  transition: all 0.3s ease;
+}
+
+.settings-section:hover .section-icon {
+  transform: scale(1.15) rotate(-5deg);
+}
+
+.ai-search-section:hover .section-icon.ai-icon {
+  animation: pulse 1s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.2); }
 }
 
 .section-desc {
@@ -1416,15 +1753,38 @@ onMounted(() => {
   font-size: 0.9375rem;
   background-color: var(--ink-paper);
   border: 1px solid var(--ink-rice);
-  border-radius: 2px;
+  border-radius: 6px;
   outline: none;
-  transition: all 0.3s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.form-input:hover,
+.form-select:hover {
+  border-color: var(--ink-sandalwood);
 }
 
 .form-input:focus,
 .form-select:focus {
   border-color: var(--ink-ochre);
-  box-shadow: 0 0 0 3px rgba(139, 69, 19, 0.1);
+  box-shadow: 0 0 0 4px rgba(139, 69, 19, 0.1), 0 4px 12px rgba(139, 69, 19, 0.08);
+  transform: translateY(-1px);
+}
+
+.form-label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all 0.3s ease;
+}
+
+.form-label svg {
+  transition: all 0.3s ease;
+  color: var(--ink-sandalwood);
+}
+
+.form-group:hover .form-label svg {
+  color: var(--ink-ochre);
+  transform: scale(1.1);
 }
 
 .input-hint {
@@ -1453,11 +1813,19 @@ onMounted(() => {
   cursor: pointer;
   font-size: 1rem;
   opacity: 0.6;
-  transition: opacity 0.3s;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  padding: 0.25rem;
+  border-radius: 50%;
 }
 
 .toggle-password:hover {
   opacity: 1;
+  transform: translateY(-50%) scale(1.2);
+  background: var(--ink-hover);
+}
+
+.toggle-password:active {
+  transform: translateY(-50%) scale(0.95);
 }
 
 /* 模型输入包装器 */
@@ -1483,32 +1851,148 @@ onMounted(() => {
   display: flex;
   gap: 1rem;
   margin-top: 1.5rem;
+  padding-top: 1rem;
+  border-top: 1px dashed var(--ink-rice);
+}
+
+.form-actions :deep(.ink-button) {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.form-actions :deep(.ink-button:hover) {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(139, 69, 19, 0.15);
+}
+
+.form-actions :deep(.ink-button:active) {
+  transform: translateY(0);
 }
 
 /* 测试结果 */
 .test-result {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.75rem;
   margin-top: 1rem;
-  padding: 0.75rem;
-  border-radius: 2px;
+  padding: 1rem 1.25rem;
+  border-radius: 8px;
   font-family: "LXGW WenKai", serif;
-  font-size: 0.875rem;
+  font-size: 0.9375rem;
+  animation: slideInUp 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  border: 1px solid transparent;
+}
+
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .test-result.success {
-  background-color: rgba(85, 107, 47, 0.1);
+  background: linear-gradient(135deg, rgba(85, 107, 47, 0.1) 0%, rgba(85, 107, 47, 0.05) 100%);
   color: var(--ink-green);
+  border-color: rgba(85, 107, 47, 0.2);
+  box-shadow: 0 2px 8px rgba(85, 107, 47, 0.1);
 }
 
 .test-result.error {
-  background-color: rgba(139, 69, 19, 0.1);
-  color: var(--ink-ochre);
+  background: linear-gradient(135deg, rgba(220, 53, 69, 0.1) 0%, rgba(220, 53, 69, 0.05) 100%);
+  color: #dc3545;
+  border-color: rgba(220, 53, 69, 0.2);
+  box-shadow: 0 2px 8px rgba(220, 53, 69, 0.1);
 }
 
 .result-icon {
   font-weight: bold;
+  font-size: 1.25rem;
+  animation: resultPop 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  display: inline-flex;
+  width: 28px;
+  height: 28px;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.5);
+  border-radius: 50%;
+}
+
+@keyframes resultPop {
+  0% {
+    transform: scale(0);
+  }
+  50% {
+    transform: scale(1.3);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.test-result.success .result-icon {
+  animation: checkmarkDraw 0.6s ease-out;
+}
+
+@keyframes checkmarkDraw {
+  0% {
+    transform: scale(0) rotate(-45deg);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.2) rotate(0deg);
+  }
+  100% {
+    transform: scale(1) rotate(0deg);
+    opacity: 1;
+  }
+}
+
+/* 保存成功提示动画 */
+.save-toast {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  padding: 1rem 1.5rem;
+  background: linear-gradient(135deg, var(--ink-green) 0%, #556b2f 100%);
+  color: white;
+  border-radius: 10px;
+  box-shadow: 0 8px 24px rgba(85, 107, 47, 0.3);
+  font-family: "LXGW WenKai", serif;
+  font-size: 0.9375rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  z-index: 2000;
+  animation: toastSlideIn 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+.save-toast.hiding {
+  animation: toastSlideOut 0.3s ease forwards;
+}
+
+@keyframes toastSlideIn {
+  from {
+    opacity: 0;
+    transform: translateX(100px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes toastSlideOut {
+  from {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateX(100px);
+  }
 }
 
 /* 设置项 */
@@ -1516,12 +2000,24 @@ onMounted(() => {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 1rem 0;
+  padding: 1.25rem;
   border-bottom: 1px solid var(--ink-rice);
+  transition: all 0.3s ease;
+  border-radius: 8px;
+  margin: 0 -0.5rem;
 }
 
 .setting-item:last-child {
   border-bottom: none;
+}
+
+.setting-item:hover {
+  background: linear-gradient(135deg, rgba(139, 69, 19, 0.02) 0%, transparent 100%);
+  transform: translateX(4px);
+}
+
+.setting-info {
+  flex: 1;
 }
 
 .setting-info label {
@@ -1529,21 +2025,32 @@ onMounted(() => {
   font-family: "LXGW WenKai", serif;
   font-size: 1rem;
   color: var(--ink-dark);
-  margin-bottom: 0.25rem;
+  margin-bottom: 0.375rem;
+  transition: color 0.3s ease;
+}
+
+.setting-item:hover .setting-info label {
+  color: var(--ink-ochre);
 }
 
 .setting-info p {
   font-family: "LXGW WenKai", serif;
   font-size: 0.875rem;
   color: var(--ink-sandalwood);
+  transition: color 0.3s ease;
+}
+
+.setting-item:hover .setting-info p {
+  color: var(--ink-sandalwood);
+  opacity: 0.9;
 }
 
 /* 开关样式 */
 .toggle-switch {
   position: relative;
   display: inline-block;
-  width: 48px;
-  height: 24px;
+  width: 52px;
+  height: 28px;
 }
 
 .toggle-switch input {
@@ -1559,29 +2066,58 @@ onMounted(() => {
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: var(--ink-rice);
-  transition: 0.3s;
-  border-radius: 24px;
+  background: linear-gradient(135deg, var(--ink-rice) 0%, #d4b483 100%);
+  transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  border-radius: 28px;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .toggle-slider:before {
   position: absolute;
   content: "";
-  height: 18px;
-  width: 18px;
+  height: 22px;
+  width: 22px;
   left: 3px;
   bottom: 3px;
-  background-color: var(--ink-paper);
-  transition: 0.3s;
+  background: linear-gradient(135deg, #ffffff 0%, #f5f1e8 100%);
+  transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
   border-radius: 50%;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+}
+
+.toggle-switch:hover .toggle-slider:before {
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25);
+  transform: scale(1.05);
 }
 
 input:checked + .toggle-slider {
-  background-color: var(--ink-ochre);
+  background: linear-gradient(135deg, var(--ink-ochre) 0%, #a0522d 100%);
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+input:checked + .toggle-slider:before {
+  transform: translateX(24px) scale(1);
 }
 
 input:checked + .toggle-slider:before {
   transform: translateX(24px);
+}
+
+/* 开关激活时的光晕效果 */
+.toggle-switch input:checked + .toggle-slider {
+  animation: switchGlow 0.5s ease;
+}
+
+@keyframes switchGlow {
+  0% {
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2), 0 0 0 0 rgba(139, 69, 19, 0.4);
+  }
+  50% {
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2), 0 0 0 8px rgba(139, 69, 19, 0.1);
+  }
+  100% {
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2), 0 0 0 0 rgba(139, 69, 19, 0);
+  }
 }
 
 /* 数据操作 */
@@ -1595,13 +2131,83 @@ input:checked + .toggle-slider:before {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 1rem;
-  background-color: var(--ink-hover);
-  border-radius: 2px;
+  padding: 1.25rem;
+  background: linear-gradient(135deg, var(--ink-hover) 0%, rgba(255, 255, 255, 0.5) 100%);
+  border-radius: 10px;
+  transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 1px solid transparent;
+  position: relative;
+  overflow: hidden;
+  animation: fadeInUp 0.5s ease-out both;
+  animation-delay: calc(var(--action-index, 0) * 0.1s);
+}
+
+.data-action-item::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 0;
+  background: linear-gradient(90deg, rgba(139, 69, 19, 0.06) 0%, transparent 100%);
+  transition: width 0.4s ease;
+}
+
+.data-action-item:hover {
+  background: linear-gradient(135deg, var(--ink-hover) 0%, rgba(139, 69, 19, 0.03) 100%);
+  border-color: var(--ink-sandalwood);
+  transform: translateX(4px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+}
+
+.data-action-item:hover::before {
+  width: 100%;
 }
 
 .data-action-item.danger {
-  background-color: rgba(139, 69, 19, 0.05);
+  background: linear-gradient(135deg, rgba(139, 69, 19, 0.05) 0%, rgba(220, 53, 69, 0.02) 100%);
+}
+
+.data-action-item.danger:hover {
+  background: linear-gradient(135deg, rgba(220, 53, 69, 0.08) 0%, rgba(139, 69, 19, 0.03) 100%);
+  border-color: rgba(220, 53, 69, 0.3);
+}
+
+/* 操作图标包装器 */
+.action-icon-wrapper {
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, rgba(139, 69, 19, 0.1) 0%, rgba(139, 69, 19, 0.05) 100%);
+  border-radius: 12px;
+  color: var(--ink-ochre);
+  transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  margin-right: 1rem;
+}
+
+.action-icon-wrapper.export {
+  background: linear-gradient(135deg, rgba(85, 107, 47, 0.15) 0%, rgba(85, 107, 47, 0.05) 100%);
+  color: var(--ink-green);
+}
+
+.action-icon-wrapper.import {
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.15) 0%, rgba(102, 126, 234, 0.05) 100%);
+  color: #667eea;
+}
+
+.action-icon-wrapper.clear {
+  background: linear-gradient(135deg, rgba(220, 53, 69, 0.1) 0%, rgba(220, 53, 69, 0.03) 100%);
+  color: #dc3545;
+}
+
+.data-action-item:hover .action-icon-wrapper {
+  transform: scale(1.1) rotate(-5deg);
+}
+
+.action-info {
+  flex: 1;
 }
 
 .action-info h4 {
@@ -1610,27 +2216,45 @@ input:checked + .toggle-slider:before {
   font-weight: 400;
   color: var(--ink-dark);
   margin-bottom: 0.25rem;
+  transition: color 0.3s ease;
 }
 
 .action-info p {
   font-family: "LXGW WenKai", serif;
   font-size: 0.875rem;
   color: var(--ink-sandalwood);
+  transition: color 0.3s ease;
 }
 
-.data-action-item.danger .action-info h4 {
+.data-action-item:hover .action-info h4 {
   color: var(--ink-ochre);
 }
 
+.data-action-item.danger .action-info h4 {
+  color: #dc3545;
+}
+
+.data-action-item.danger:hover .action-info h4 {
+  color: #c82333;
+}
+
 .storage-info {
-  margin-top: 1rem;
+  margin-top: 1.5rem;
   text-align: center;
+  padding: 1rem;
+  background: linear-gradient(135deg, rgba(139, 69, 19, 0.03) 0%, transparent 100%);
+  border-radius: 8px;
+  animation: fadeInUp 0.6s ease-out 0.5s both;
 }
 
 .storage-info p {
   font-family: "LXGW WenKai", serif;
   font-size: 0.875rem;
   color: var(--ink-sandalwood);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
 }
 
 /* 关于内容 */
@@ -1638,78 +2262,253 @@ input:checked + .toggle-slider:before {
   text-align: center;
 }
 
-.app-logo {
-  margin-bottom: 1.5rem;
+.about-logo {
+  margin-bottom: 2rem;
+  animation: fadeInUp 0.8s ease-out both;
+}
+
+.logo-circle {
+  width: 80px;
+  height: 80px;
+  margin: 0 auto 1rem;
+  background: linear-gradient(135deg, var(--ink-ochre) 0%, #a0522d 100%);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8px 24px rgba(139, 69, 19, 0.25);
+  animation: sealStamp 1s cubic-bezier(0.68, -0.55, 0.265, 1.55) 0.3s both;
+  position: relative;
+  overflow: hidden;
+}
+
+.logo-circle::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(255,255,255,0.3) 0%, transparent 60%);
+  animation: shimmer 3s ease-in-out infinite;
+}
+
+@keyframes sealStamp {
+  0% {
+    opacity: 0;
+    transform: scale(2) rotate(-10deg);
+  }
+  50% {
+    transform: scale(0.9) rotate(2deg);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) rotate(0);
+  }
+}
+
+@keyframes shimmer {
+  0%, 100% {
+    transform: translate(-30%, -30%) rotate(0deg);
+  }
+  50% {
+    transform: translate(-20%, -20%) rotate(180deg);
+  }
 }
 
 .logo-icon {
-  font-size: 4rem;
-  display: block;
-  margin-bottom: 0.5rem;
+  font-size: 2.5rem;
+  color: var(--ink-paper);
+  font-family: "LXGW WenKai", serif;
+  position: relative;
+  z-index: 1;
 }
 
-.app-logo h3 {
+.about-logo h3 {
   font-family: "LXGW WenKai", serif;
-  font-size: 1.5rem;
+  font-size: 1.75rem;
   font-weight: 400;
   color: var(--ink-dark);
-  margin-bottom: 0.25rem;
+  margin-bottom: 0.5rem;
+  letter-spacing: 0.1em;
 }
 
-.version {
+.version-badge {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  background: linear-gradient(135deg, var(--ink-hover) 0%, rgba(139, 69, 19, 0.05) 100%);
+  border-radius: 20px;
+  font-family: "LXGW WenKai", serif;
+  font-size: 0.8125rem;
+  color: var(--ink-sandalwood);
+  border: 1px solid var(--ink-rice);
+  animation: fadeIn 0.6s ease-out 0.8s both;
+}
+
+/* 关于描述 */
+.about-description.serious {
+  text-align: left;
+  background: linear-gradient(135deg, rgba(139, 69, 19, 0.03) 0%, transparent 100%);
+  padding: 1.25rem;
+  border-radius: 10px;
+  margin-bottom: 1.5rem;
+  border-left: 3px solid var(--ink-ochre);
+  animation: fadeInUp 0.6s ease-out 0.5s both;
+}
+
+.about-description.serious h4 {
+  font-family: "LXGW WenKai", serif;
+  font-size: 1.1rem;
+  font-weight: 400;
+  color: var(--ink-dark);
+  margin-bottom: 0.75rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.about-description.serious p {
+  font-family: "LXGW WenKai", serif;
+  font-size: 0.9rem;
+  color: var(--ink-sandalwood);
+  line-height: 1.8;
+  margin: 0;
+}
+
+/* 特性列表 */
+.about-features.compact {
+  display: flex;
+  justify-content: center;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+  margin-bottom: 1.5rem;
+  animation: fadeInUp 0.6s ease-out 0.7s both;
+}
+
+.about-features.compact .feature-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: linear-gradient(135deg, rgba(139, 69, 19, 0.05) 0%, rgba(139, 69, 19, 0.02) 100%);
+  border-radius: 8px;
+  transition: all 0.3s ease;
+  animation: fadeInUp 0.5s ease-out both;
+  animation-delay: calc(var(--feature-index, 0) * 0.1s + 0.8s);
+}
+
+.about-features.compact .feature-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  background: linear-gradient(135deg, rgba(139, 69, 19, 0.08) 0%, rgba(139, 69, 19, 0.03) 100%);
+}
+
+.about-features.compact .feature-icon-wrapper {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, rgba(139, 69, 19, 0.12) 0%, rgba(139, 69, 19, 0.06) 100%);
+  border-radius: 8px;
+  color: var(--ink-ochre);
+  transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+.about-features.compact .feature-item:hover .feature-icon-wrapper {
+  transform: scale(1.1) rotate(-5deg);
+  background: linear-gradient(135deg, rgba(139, 69, 19, 0.2) 0%, rgba(139, 69, 19, 0.1) 100%);
+}
+
+.about-features.compact span {
   font-family: "LXGW WenKai", serif;
   font-size: 0.875rem;
   color: var(--ink-sandalwood);
 }
 
-.about-desc {
+/* 快速链接 */
+.quick-links {
+  margin: 1.5rem 0;
+  padding: 1.25rem;
+  background: linear-gradient(135deg, rgba(139, 69, 19, 0.03) 0%, rgba(139, 69, 19, 0.01) 100%);
+  border-radius: 10px;
+  border: 1px solid rgba(139, 69, 19, 0.1);
+  animation: fadeInUp 0.6s ease-out 0.9s both;
+}
+
+.quick-links h4 {
   font-family: "LXGW WenKai", serif;
   font-size: 0.9375rem;
-  color: var(--ink-dark);
-  line-height: 1.8;
-  margin-bottom: 1.5rem;
-  text-align: left;
-}
-
-.about-features {
-  text-align: left;
-  margin-bottom: 1.5rem;
-}
-
-.about-features h4 {
-  font-family: "LXGW WenKai", serif;
-  font-size: 1rem;
   font-weight: 400;
   color: var(--ink-dark);
-  margin-bottom: 0.75rem;
+  margin-bottom: 0.875rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
 }
 
-.about-features ul {
-  list-style: none;
-  padding: 0;
-}
-
-.about-features li {
-  font-family: "LXGW WenKai", serif;
-  font-size: 0.875rem;
-  color: var(--ink-dark);
-  padding: 0.375rem 0;
-  padding-left: 1.5rem;
-  position: relative;
-}
-
-.about-features li::before {
-  content: "•";
-  position: absolute;
-  left: 0.5rem;
+.quick-links h4 svg {
   color: var(--ink-ochre);
 }
 
+.links-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.link-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.625rem 1rem;
+  background: rgba(255, 255, 255, 0.8);
+  border: 1px solid rgba(139, 69, 19, 0.15);
+  border-radius: 8px;
+  font-family: "LXGW WenKai", serif;
+  font-size: 0.875rem;
+  color: var(--ink-dark);
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.link-btn:hover {
+  background: rgba(139, 69, 19, 0.05);
+  border-color: var(--ink-sandalwood);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+}
+
+.link-icon {
+  font-size: 1.1rem;
+}
+
+/* 版权信息 */
 .copyright {
   font-family: "LXGW WenKai", serif;
   font-size: 0.8125rem;
   color: var(--ink-sandalwood);
-  opacity: 0.7;
+  opacity: 0.8;
+  animation: fadeIn 0.6s ease-out 1s both;
+  padding-top: 1rem;
+  border-top: 1px solid var(--ink-rice);
+}
+
+/* Teleport 模态框过渡动画 */
+.modal-enter-active,
+.modal-leave-active {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.modal-enter-from,
+.modal-leave-to {
+  opacity: 0;
+}
+
+.modal-enter-from .confirm-dialog,
+.modal-leave-to .confirm-dialog {
+  opacity: 0;
+  transform: translateY(20px) scale(0.95);
 }
 
 /* 对话框 */
@@ -1719,42 +2518,92 @@ input:checked + .toggle-slider:before {
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(44, 62, 80, 0.5);
+  background-color: rgba(44, 62, 80, 0.6);
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 1000;
+  z-index: 10000;
+  backdrop-filter: blur(4px);
 }
 
 .confirm-dialog {
-  background-color: var(--ink-paper);
+  background: linear-gradient(135deg, var(--ink-paper) 0%, #fdfbf7 100%);
   padding: 2rem;
-  border-radius: 2px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+  border-radius: 12px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3), 0 8px 24px rgba(0, 0, 0, 0.15);
   text-align: center;
-  max-width: 400px;
+  max-width: 420px;
   width: 90%;
+  animation: dialogScaleIn 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  border: 1px solid var(--ink-rice);
+  position: relative;
+  overflow: hidden;
+}
+
+.confirm-dialog::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, var(--ink-ochre) 0%, var(--ink-sandalwood) 50%, var(--ink-ochre) 100%);
+  opacity: 0.5;
+}
+
+@keyframes dialogScaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9) translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 .confirm-dialog h3 {
   font-family: "LXGW WenKai", serif;
-  font-size: 1.25rem;
+  font-size: 1.35rem;
   font-weight: 400;
   color: var(--ink-dark);
   margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
 }
 
 .confirm-dialog p {
   font-family: "LXGW WenKai", serif;
   color: var(--ink-sandalwood);
   margin-bottom: 1.5rem;
-  line-height: 1.6;
+  line-height: 1.7;
 }
 
 .dialog-actions {
   display: flex;
   gap: 1rem;
   justify-content: center;
+}
+
+/* 对话框按钮悬停效果 */
+.dialog-actions :deep(.ink-button) {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.dialog-actions :deep(.ink-button:hover) {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(139, 69, 19, 0.2);
 }
 
 .hidden {
@@ -2125,15 +2974,36 @@ input:checked + .toggle-slider:before {
   color: #dc3545;
 }
 
+.warning-highlight {
+  background: rgba(220, 53, 69, 0.08);
+  border: 1px solid rgba(220, 53, 69, 0.2);
+  border-radius: 6px;
+  padding: 0.75rem 1rem;
+  margin-top: 0.75rem;
+  font-size: 0.875rem;
+  color: #721c24;
+}
+
 .disclaimer-timer {
   text-align: center;
-  padding: 0.75rem;
-  background: rgba(255, 193, 7, 0.1);
-  border-radius: 4px;
+  padding: 0.875rem;
+  background: linear-gradient(135deg, rgba(255, 193, 7, 0.15) 0%, rgba(255, 193, 7, 0.05) 100%);
+  border-radius: 8px;
   font-family: "LXGW WenKai", serif;
-  font-size: 0.875rem;
+  font-size: 0.9375rem;
   color: #856404;
   margin-top: 1rem;
+  border: 1px solid rgba(255, 193, 7, 0.3);
+  animation: pulse 2s ease-in-out infinite;
+}
+
+.timer-icon {
+  margin-right: 0.5rem;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
 }
 
 .disclaimer-checkbox {
@@ -2239,8 +3109,14 @@ input:checked + .toggle-slider:before {
 .advanced-options {
   margin: 1.5rem 0;
   border: 1px solid var(--ink-rice);
-  border-radius: 4px;
+  border-radius: 8px;
   overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.advanced-options:hover {
+  border-color: var(--ink-sandalwood);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
 }
 
 .advanced-toggle {
@@ -2249,23 +3125,41 @@ input:checked + .toggle-slider:before {
   align-items: center;
   gap: 0.75rem;
   padding: 0.875rem 1rem;
-  background: var(--ink-hover);
+  background: linear-gradient(135deg, var(--ink-hover) 0%, rgba(139, 69, 19, 0.03) 100%);
   border: none;
   cursor: pointer;
   font-family: "LXGW WenKai", serif;
   font-size: 0.9375rem;
   color: var(--ink-dark);
-  transition: background 0.3s;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.advanced-toggle::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 0;
+  background: linear-gradient(90deg, rgba(139, 69, 19, 0.08) 0%, transparent 100%);
+  transition: width 0.4s ease;
 }
 
 .advanced-toggle:hover {
-  background: var(--ink-rice);
+  background: linear-gradient(135deg, var(--ink-rice) 0%, rgba(139, 69, 19, 0.05) 100%);
+}
+
+.advanced-toggle:hover::before {
+  width: 100%;
 }
 
 .toggle-icon {
   font-size: 0.75rem;
-  transition: transform 0.3s;
+  transition: transform 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
   color: var(--ink-sandalwood);
+  display: inline-flex;
 }
 
 .toggle-icon.expanded {
@@ -2276,11 +3170,17 @@ input:checked + .toggle-slider:before {
   margin-left: auto;
   font-size: 0.8125rem;
   color: var(--ink-sandalwood);
+  transition: all 0.3s ease;
+}
+
+.advanced-toggle:hover .toggle-hint {
+  color: var(--ink-ochre);
+  transform: translateX(-4px);
 }
 
 .advanced-content {
   padding: 1.25rem;
-  background: var(--ink-paper);
+  background: linear-gradient(180deg, var(--ink-paper) 0%, rgba(139, 69, 19, 0.02) 100%);
   border-top: 1px solid var(--ink-rice);
 }
 
@@ -2293,48 +3193,73 @@ input:checked + .toggle-slider:before {
 
 .form-slider {
   flex: 1;
-  height: 6px;
-  border-radius: 3px;
-  background: var(--ink-rice);
+  height: 8px;
+  border-radius: 4px;
+  background: linear-gradient(90deg, var(--ink-rice) 0%, var(--ink-rice) 100%);
   outline: none;
   -webkit-appearance: none;
+  transition: all 0.3s ease;
+}
+
+.form-slider:hover {
+  background: linear-gradient(90deg, var(--ink-sandalwood) 0%, var(--ink-sandalwood) 100%);
 }
 
 .form-slider::-webkit-slider-thumb {
   -webkit-appearance: none;
-  width: 18px;
-  height: 18px;
+  width: 20px;
+  height: 20px;
   border-radius: 50%;
-  background: var(--ink-ochre);
+  background: linear-gradient(135deg, var(--ink-ochre) 0%, #a0522d 100%);
   cursor: pointer;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-  transition: transform 0.2s;
+  box-shadow: 0 2px 8px rgba(139, 69, 19, 0.3);
+  transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  border: 2px solid white;
 }
 
 .form-slider::-webkit-slider-thumb:hover {
-  transform: scale(1.2);
+  transform: scale(1.3);
+  box-shadow: 0 4px 12px rgba(139, 69, 19, 0.4);
+}
+
+.form-slider::-webkit-slider-thumb:active {
+  transform: scale(1.1);
+  box-shadow: 0 2px 6px rgba(139, 69, 19, 0.5);
 }
 
 .form-slider::-moz-range-thumb {
-  width: 18px;
-  height: 18px;
+  width: 20px;
+  height: 20px;
   border-radius: 50%;
-  background: var(--ink-ochre);
+  background: linear-gradient(135deg, var(--ink-ochre) 0%, #a0522d 100%);
   cursor: pointer;
-  border: none;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  border: 2px solid white;
+  box-shadow: 0 2px 8px rgba(139, 69, 19, 0.3);
+  transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+.form-slider::-moz-range-thumb:hover {
+  transform: scale(1.3);
+  box-shadow: 0 4px 12px rgba(139, 69, 19, 0.4);
 }
 
 .slider-value {
-  min-width: 48px;
+  min-width: 52px;
   text-align: center;
   font-family: "LXGW WenKai", serif;
   font-size: 0.9375rem;
-  font-weight: 500;
+  font-weight: 600;
   color: var(--ink-ochre);
-  padding: 0.25rem 0.5rem;
-  background: var(--ink-hover);
-  border-radius: 4px;
+  padding: 0.375rem 0.625rem;
+  background: linear-gradient(135deg, var(--ink-hover) 0%, rgba(139, 69, 19, 0.05) 100%);
+  border-radius: 6px;
+  transition: all 0.3s ease;
+  border: 1px solid transparent;
+}
+
+.slider-value:hover {
+  border-color: var(--ink-sandalwood);
+  transform: scale(1.05);
 }
 
 /* 复选框组 */
@@ -2366,9 +3291,15 @@ input:checked + .toggle-slider:before {
 }
 
 /* 展开动画 */
-.expand-enter-active,
+.expand-enter-active {
+  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  max-height: 2000px;
+  opacity: 1;
+  overflow: hidden;
+}
+
 .expand-leave-active {
-  transition: all 0.3s ease;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   max-height: 2000px;
   opacity: 1;
   overflow: hidden;
@@ -2378,6 +3309,23 @@ input:checked + .toggle-slider:before {
 .expand-leave-to {
   max-height: 0;
   opacity: 0;
+}
+
+/* 高级选项内容项动画 */
+.advanced-content .form-group {
+  animation: slideInRight 0.4s ease-out both;
+  animation-delay: calc(var(--group-index, 0) * 0.05s);
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
 }
 
 /* 响应式 */
