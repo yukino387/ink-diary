@@ -19,52 +19,89 @@ if ($LASTEXITCODE -eq 0) {
     Write-Host ""
     Write-Host "✅ 构建成功！" -ForegroundColor Green
     Write-Host ""
+    
+    # 生成 Cloudflare Pages 配置文件
+    Write-Host "📄 正在生成 Cloudflare Pages 配置文件..." -ForegroundColor Cyan
+    
+    $wranglerContent = @"
+# Cloudflare Pages 配置文件
+# 由 build.ps1 自动生成
+# 文档: https://developers.cloudflare.com/pages/platform/headers/
 
-    # 自动生成 Cloudflare Pages 配置文件到 dist 目录
-    Write-Host "🔧 正在生成 Cloudflare Pages 配置文件..." -ForegroundColor Cyan
+name = "ink-diary"
+compatibility_date = "2024-01-01"
 
-    # 生成 _headers 文件
-    $headersContent = @"
-/manifest.json
-  Content-Type: application/manifest+json
-  Access-Control-Allow-Origin: *
+[build]
+command = "npm run build"
+output_directory = "dist"
 
-/service-worker.js
-  Cache-Control: no-cache
+[build.environment]
+NODE_VERSION = "20"
 
-/*.js
-  Cache-Control: public, max-age=31536000
+# 单页应用路由规则 - 所有路由指向 index.html
+[[redirects]]
+from = "/*"
+to = "/index.html"
+status = 200
 
-/*.css
-  Cache-Control: public, max-age=31536000
+# manifest.json 响应头
+[[headers]]
+for = "/manifest.json"
+[headers.values]
+Content-Type = "application/manifest+json"
+Access-Control-Allow-Origin = "*"
+
+# Service Worker 不缓存
+[[headers]]
+for = "/service-worker.js"
+[headers.values]
+Cache-Control = "no-cache"
+
+# JS 文件长期缓存
+[[headers]]
+for = "/*.js"
+[headers.values]
+Cache-Control = "public, max-age=31536000, immutable"
+
+# CSS 文件长期缓存
+[[headers]]
+for = "/*.css"
+[headers.values]
+Cache-Control = "public, max-age=31536000, immutable"
+
+# 字体文件长期缓存
+[[headers]]
+for = "/*.woff2"
+[headers.values]
+Cache-Control = "public, max-age=31536000, immutable"
+
+# 图片文件长期缓存
+[[headers]]
+for = "/*.png"
+[headers.values]
+Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+for = "/*.svg"
+[headers.values]
+Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+for = "/*.ico"
+[headers.values]
+Cache-Control = "public, max-age=31536000, immutable"
 "@
-    $headersContent | Out-File -FilePath "dist\_headers" -Encoding UTF8 -NoNewline
-    Write-Host "  ✓ 已生成 _headers" -ForegroundColor Green
-
-    # 生成 _redirects 文件
-    $redirectsContent = "/* /index.html 200"
-    $redirectsContent | Out-File -FilePath "dist\_redirects" -Encoding UTF8 -NoNewline
-    Write-Host "  ✓ 已生成 _redirects" -ForegroundColor Green
-
-    # 生成 _routes.json (Cloudflare Pages 路由配置)
-    $routesContent = @"
-{
-  "version": 1,
-  "include": ["/*"],
-  "exclude": []
-}
-"@
-    $routesContent | Out-File -FilePath "dist\_routes.json" -Encoding UTF8 -NoNewline
-    Write-Host "  ✓ 已生成 _routes.json" -ForegroundColor Green
-
+    
+    $wranglerContent | Out-File -FilePath "wrangler.toml" -Encoding UTF8
+    Write-Host "✅ wrangler.toml 生成完成！" -ForegroundColor Green
     Write-Host ""
     Write-Host "📁 构建输出目录: dist/"
     Write-Host "🌐 本地预览: npx serve dist"
     Write-Host ""
-    Write-Host "🚀 部署提示:" -ForegroundColor Yellow
-    Write-Host "  • Cloudflare Pages: 直接上传 dist 文件夹" -ForegroundColor Gray
-    Write-Host "  • GitHub Pages: 已配置自动部署工作流" -ForegroundColor Gray
-    Write-Host "  • Netlify: 使用 netlify.toml 配置" -ForegroundColor Gray
+    Write-Host "☁️ Cloudflare Pages 部署:" -ForegroundColor Cyan
+    Write-Host "   1. 访问 https://dash.cloudflare.com/pages"
+    Write-Host "   2. 创建项目并连接 GitHub 仓库"
+    Write-Host "   3. 或使用命令: wrangler pages deploy dist"
 } else {
     Write-Host ""
     Write-Host "❌ 构建失败！" -ForegroundColor Red
