@@ -1,13 +1,65 @@
+# Cloudflare Pages 配置文件
+# 文档: https://developers.cloudflare.com/pages/platform/headers/
+
 name = "ink-diary"
 compatibility_date = "2024-01-01"
 
 [build]
 command = "npm run build"
+output_directory = "dist"
 
-[site]
-bucket = "dist"
+[build.environment]
+NODE_VERSION = "20"
 
+# 单页应用路由规则 - 所有路由指向 index.html
 [[redirects]]
 from = "/*"
 to = "/index.html"
 status = 200
+
+# manifest.json 响应头
+[[headers]]
+for = "/manifest.json"
+[headers.values]
+Content-Type = "application/manifest+json"
+Access-Control-Allow-Origin = "*"
+
+# Service Worker 不缓存
+[[headers]]
+for = "/service-worker.js"
+[headers.values]
+Cache-Control = "no-cache"
+
+# JS 文件长期缓存
+[[headers]]
+for = "/*.js"
+[headers.values]
+Cache-Control = "public, max-age=31536000, immutable"
+
+# CSS 文件长期缓存
+[[headers]]
+for = "/*.css"
+[headers.values]
+Cache-Control = "public, max-age=31536000, immutable"
+
+# 字体文件长期缓存
+[[headers]]
+for = "/*.woff2"
+[headers.values]
+Cache-Control = "public, max-age=31536000, immutable"
+
+# 图片文件长期缓存
+[[headers]]
+for = "/*.png"
+[headers.values]
+Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+for = "/*.svg"
+[headers.values]
+Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+for = "/*.ico"
+[headers.values]
+Cache-Control = "public, max-age=31536000, immutable"
